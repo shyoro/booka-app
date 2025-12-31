@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile
+    platform: linux/amd64
     image: shayazulay/booka-docker:${APP_VERSION}
     container_name: booka-app
     environment:
