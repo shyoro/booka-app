@@ -1,0 +1,107 @@
+---
+alwaysApply: false
+---
+# Booka Project Rules
+
+## Code Style Guidelines
+
+### General Principles
+- Do not over-engineer the solution - use a holistic approach to development and remember that simple code is better than fancy logic
+- Avoid nested if statements - use early returns or guard clauses
+- Avoid the use of the keyword `else` when possible
+- Avoid nested loops as much as possible
+- Use the most efficient code possible
+- When creating new functions, methods, or classes, always add JSDoc comments
+- Try to make functions short and do one thing
+- When generating strings in JavaScript or TypeScript, use template literals
+- Do not use double quotes in code, only in HTML or HTML templates
+
+### TypeScript
+- Use strict mode
+- Prefer type inference where possible
+- Use interfaces for object shapes
+- Use types for unions, intersections, and computed types
+- Always type function parameters and return types
+
+### NestJS Patterns
+- Use dependency injection for all services
+- Keep controllers thin - delegate business logic to services
+- Use modules to organize code by feature
+- Use global modules sparingly (only for truly global concerns like database)
+- **Service Architecture**: Design for future service splitting and enhancement
+  - Group related business logic together (e.g., booking logic, search logic)
+  - Keep booking and search functionality in cohesive, well-defined modules
+  - Design interfaces and abstractions that allow easy extraction into separate services
+  - Use clear boundaries between different business domains to facilitate future microservice splits
+
+### Database (Drizzle ORM)
+- Define schemas in `src/database/schema.ts`
+- Use migrations for all schema changes
+- Never modify migrations after they've been applied
+- Use transactions for multi-step operations
+- Always validate data before database operations
+- **Database Constraints**: Use the database's natural ability to enforce rules
+  - Implement UNIQUE indexes to prevent duplicate bookings and enforce business rules at the database level
+  - Leverage database constraints for data integrity rather than relying solely on application-level validation
+
+### Validation (Zod)
+- Use Zod schemas for all DTOs
+- Validate environment variables on startup
+- Create reusable schema components
+- Infer TypeScript types from Zod schemas
+
+### Testing
+- Write tests for all business logic
+- Use Vitest for unit and integration tests
+- Aim for high code coverage on critical paths
+- Mock external dependencies
+- Use descriptive test names
+
+### Docker
+- Use multi-stage builds for production images
+- Keep images small (use Alpine base images)
+- Run containers as non-root users
+- Use health checks for services
+- Don't store secrets in Dockerfiles
+
+### Error Handling
+- Use appropriate HTTP status codes
+- Provide meaningful error messages
+- Log errors with context
+- Don't expose internal errors to clients
+
+### Performance
+- Use connection pooling for database
+- Implement caching where appropriate
+- Optimize database queries
+- Monitor application performance
+- **Caching Strategy**: Design code with caching in mind (Redis-ready)
+  - Structure code to easily introduce Redis caching layers
+  - Separate cacheable operations from business logic
+  - Use cache-aside pattern for read operations
+  - Consider cache invalidation strategies when designing data models
+- **Search Optimization**: All search actions must be super optimized for fast lookups and retrieval
+  - Use relevant caching techniques for search queries
+  - Implement query result caching with appropriate TTLs
+  - Consider full-text search indexes for complex search scenarios
+  - Cache frequently accessed search results and filter combinations
+
+### Concurrency Control
+- **Optimistic Concurrency Control**: Implement version checks on booking queries
+  - Add version/optimistic locking fields to booking entities
+  - Check version numbers before updating bookings to prevent race conditions
+  - Handle concurrent booking conflicts gracefully with appropriate error responses
+  - Use database-level locking mechanisms when necessary for critical booking operations
+- Be mindful of concurrent issues in room booking scenarios
+  - Multiple users booking the same room/time slot simultaneously
+  - Prevent double-booking through proper concurrency control mechanisms
+
+### Security
+- Validate all input
+- Use parameterized queries (Drizzle handles this)
+- Keep dependencies up to date
+- Use environment variables for secrets
+- Enable CORS appropriately
+
+### Git
+- Write clear commit messages
