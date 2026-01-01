@@ -289,7 +289,7 @@ erDiagram
 - `POST /api/v1/bookings` - Create new booking
 - `GET /api/v1/bookings` - Get user's booking history (query parameters: status, dateFrom, dateTo, page, limit)
 - `GET /api/v1/bookings/:id` - Get booking details
-- `DELETE /api/v1/bookings/:id` - Cancel booking
+- `PATCH /api/v1/bookings/:id/cancel` - Cancel booking
 
 ### Request/Response Formats
 
@@ -626,7 +626,7 @@ Swagger documentation is available at `/api` endpoint and must be kept up-to-dat
 ### Testing Strategy
 - **Unit Tests**: Test individual services and utilities
 - **Integration Tests**: Test API endpoints with mock data
-- **Test Coverage**: Aim for 80%+ coverage
+- **Test Coverage**: Aim for coverage of endpoints and business logic
 
 ### Monitoring & Observability
 - **Logging**: Basic structured logging (can be enhanced with correlation IDs in future)
@@ -637,7 +637,6 @@ Swagger documentation is available at `/api` endpoint and must be kept up-to-dat
 
 - **Multi-Region Deployment**: Support for distributed deployment across multiple regions
 - **Redis Integration**: Add Redis for distributed rate limiting, caching, and session management
-- **Async Email Processing**: Implement message queue for asynchronous email processing
 - **Circuit Breakers**: Add circuit breaker pattern for external service calls
 - **Advanced Monitoring**: Implement comprehensive monitoring, metrics, and alerting
 - **Payment Gateway Integration**: Integrate payment processing

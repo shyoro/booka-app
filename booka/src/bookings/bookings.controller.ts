@@ -2,7 +2,7 @@ import {
   Controller,
   Get,
   Post,
-  Delete,
+  Patch,
   Body,
   Param,
   Query,
@@ -160,7 +160,7 @@ export class BookingsController {
   /**
    * Cancel a booking
    */
-  @Delete(':id')
+  @Patch(':id/cancel')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Cancel a booking' })
   @ApiParam({ name: 'id', type: Number, description: 'Booking ID' })

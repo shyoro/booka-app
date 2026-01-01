@@ -172,7 +172,7 @@ The following endpoints will be available:
   - `POST /bookings` - Create a new booking
   - `GET /bookings` - Get user's booking history
   - `GET /bookings/:id` - Get booking details
-  - `DELETE /bookings/:id` - Cancel a booking
+  - `PATCH /bookings/:id/cancel` - Cancel a booking
 
 ## Testing
 

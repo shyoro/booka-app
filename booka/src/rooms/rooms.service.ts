@@ -3,6 +3,7 @@ import { eq, and, gte, lte, sql, or, ilike } from 'drizzle-orm';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { rooms, bookings } from '../database/schema';
 import { SearchRoomsDto } from './rooms.dto';
+import { calculateTotalPrice, calculateNights } from '../common/utils/price.utils';
 
 /**
  * Rooms service
@@ -117,8 +118,25 @@ export class RoomsService {
       availableRooms = results.filter((room) => !conflictingRoomIds.has(room.id));
     }
 
+    // Add estimated total price if date range is provided
+    const roomsWithPrice = availableRooms.map((room) => {
+      const roomData: typeof room & { estimatedTotalPrice?: string; nights?: number } = { ...room };
+      
+      if (dateFrom && dateTo) {
+        try {
+          roomData.estimatedTotalPrice = calculateTotalPrice(dateFrom, dateTo, room.pricePerNight);
+          roomData.nights = calculateNights(dateFrom, dateTo);
+        } catch (error) {
+          // If price calculation fails, don't include estimated price
+          console.error(`Failed to calculate price for room ${room.id}:`, error);
+        }
+      }
+      
+      return roomData;
+    });
+
     return {
-      data: availableRooms,
+      data: roomsWithPrice,
       pagination: {
         page,
         limit,
@@ -157,8 +175,10 @@ export class RoomsService {
     const checkInDate = new Date(dateFrom);
     checkInDate.setHours(0, 0, 0, 0);
 
+    // Verify room exists
+    const room = await this.findById(roomId);
+
     if (checkInDate < today) {
-      const room = await this.findById(roomId);
       return {
         roomId,
         roomName: room.name,
@@ -166,11 +186,10 @@ export class RoomsService {
         dateTo,
         available: false,
         conflictingBookings: 0,
+        totalPrice: null,
+        nights: 0,
       };
     }
-
-    // Verify room exists
-    const room = await this.findById(roomId);
 
     // Check for conflicting bookings
     const conflictingBookings = await this.db
@@ -188,6 +207,19 @@ export class RoomsService {
 
     const isAvailable = conflictingBookings.length === 0;
 
+    // Calculate total price and nights
+    let totalPrice: string | null = null;
+    let nights = 0;
+    
+    if (isAvailable) {
+      try {
+        totalPrice = calculateTotalPrice(dateFrom, dateTo, room.pricePerNight);
+        nights = calculateNights(dateFrom, dateTo);
+      } catch (error) {
+        console.error(`Failed to calculate price for room ${roomId}:`, error);
+      }
+    }
+
     return {
       roomId,
       roomName: room.name,
@@ -195,6 +227,8 @@ export class RoomsService {
       dateTo,
       available: isAvailable,
       conflictingBookings: conflictingBookings.length,
+      totalPrice,
+      nights,
     };
   }
 

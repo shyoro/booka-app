@@ -12,6 +12,7 @@ import { CreateBookingDto, GetBookingsDto } from './bookings.dto';
 import { RoomsService } from '../rooms/rooms.service';
 import { EmailsService } from '../emails/emails.service';
 import { UsersService } from '../users/users.service';
+import { calculateTotalPrice } from '../common/utils/price.utils';
 
 /**
  * Bookings service
@@ -86,11 +87,7 @@ export class BookingsService {
       }
 
       // Calculate total price
-      const checkIn = new Date(checkInDate);
-      const checkOut = new Date(checkOutDate);
-      const nights = Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24));
-      const pricePerNight = parseFloat(room.pricePerNight);
-      const totalPrice = (nights * pricePerNight).toFixed(2);
+      const totalPrice = calculateTotalPrice(checkInDate, checkOutDate, room.pricePerNight);
 
       // Create booking
       const [booking] = await tx
