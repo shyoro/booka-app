@@ -6,7 +6,8 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "generate:api-types": "openapi-typescript http://localhost:3000/api-json -o app/types/api-types.ts"
   },
   "dependencies": {
     "@react-router/node": "7.10.1",

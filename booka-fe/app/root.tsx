@@ -6,8 +6,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { useState } from "react";
 
 import type { Route } from "./+types/root";
+import { createQueryClient } from "./lib/query-client";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -27,6 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
+        <title>Book-A Room</title>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
@@ -42,23 +46,48 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const [queryClient] = useState(() => createQueryClient());
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Outlet />
+    </QueryClientProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
   let stack: string | undefined;
+  let shouldShowError = true;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
+    const status = error.status;
+
+    // Silently handle well-known paths (browser extensions, etc.)
+    if (status === 404 && typeof window !== 'undefined') {
+      const pathname = window.location.pathname;
+      if (pathname.startsWith('/.well-known/')) {
+        shouldShowError = false;
+      }
+    }
+
+    if (shouldShowError) {
+      message = status === 404 ? "404" : "Error";
+      details =
+        status === 404
+          ? "The requested page could not be found."
+          : error.statusText || details;
+    }
   } else if (import.meta.env.DEV && error && error instanceof Error) {
+    // Only show error details in development for non-route errors
     details = error.message;
     stack = error.stack;
+  }
+
+  // Don't render error UI for well-known paths
+  if (!shouldShowError) {
+    return null;
   }
 
   return (

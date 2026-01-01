@@ -16,30 +16,30 @@ Authorization: Bearer <your-access-token>
 
 ## Quick Start for React
 
-### 1. Install axios
+### 1. Install openapi-fetch
 ```bash
-npm install axios
+npm install openapi-fetch
 ```
 
 ### 2. Create API client
 ```typescript
-// src/lib/api.ts
-import axios from 'axios';
+// src/lib/api-client.ts
+import createClient from 'openapi-fetch';
+import type { paths } from './types/api-types';
 
-const api = axios.create({
-  baseURL: 'http://localhost:3000/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+const api = createClient<paths>({
+  baseUrl: 'http://localhost:3000',
 });
 
 // Add auth token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+api.use({
+  onRequest({ request }) {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      request.headers.set('Authorization', `Bearer ${token}`);
+    }
+    return request;
+  },
 });
 
 export default api;
@@ -48,17 +48,21 @@ export default api;
 ### 3. Use in components
 ```typescript
 // Login example
-const response = await api.post('/auth/login', {
-  email: 'user@example.com',
-  password: 'password123',
+const { data, error } = await api.POST('/api/v1/auth/login', {
+  body: {
+    email: 'user@example.com',
+    password: 'password123',
+  },
 });
 
-// Save tokens
-localStorage.setItem('accessToken', response.data.data.tokens.accessToken);
-localStorage.setItem('refreshToken', response.data.data.tokens.refreshToken);
+if (data) {
+  // Save tokens
+  localStorage.setItem('accessToken', data.data.tokens.accessToken);
+  localStorage.setItem('refreshToken', data.data.tokens.refreshToken);
+}
 
 // Get bookings
-const bookings = await api.get('/bookings');
+const { data: bookingsData } = await api.GET('/api/v1/bookings');
 ```
 
 ## Endpoints
