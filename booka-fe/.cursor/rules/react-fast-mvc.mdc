@@ -1,0 +1,405 @@
+---
+alwaysApply: true
+---
+---
+description: Rules for building React features with shadcn, Tailwind, and OpenAPI
+globs: app/**/*.{ts,tsx}
+---
+
+# React Coding Standards (MVC Pattern)
+
+You are an expert React developer specializing in high-performance SPAs. 
+
+## 1. Data Layer (Model)
+- Use `app/types/api-types.ts` as the single source of truth for all types.
+- Never manually define interfaces for API responses.
+- Access types via `paths["/path"]["get"]["responses"][200]["content"]["application/json"]`.
+- Generate types from OpenAPI spec using `openapi-typescript`.
+- Keep types in sync with backend API changes.
+
+## 2. Logic Layer (Controller)
+- All API interactions must live in `app/hooks/api/`.
+- Use `openapi-fetch` for the client and `@tanstack/react-query` for caching/state.
+- Hooks should return `{ data, isLoading, error, mutate, refetch }`.
+- Use React Query's `useQuery` for GET requests and `useMutation` for POST/PUT/DELETE.
+- Implement proper error handling in all hooks.
+- Use query invalidation for cache management after mutations.
+
+## 3. UI Layer (View)
+- Use **Tailwind CSS** for all styling. No CSS modules or inline styles.
+- Use **shadcn/ui** components located in `app/components/ui`.
+- When creating new features, check `app/components/ui` first before building from scratch.
+- Use the `cn()` utility for all conditional class merging (from `app/lib/utils.ts`).
+- Keep components small and focused on a single responsibility.
+
+## 4. Component Composition Patterns
+
+### Component Structure
+- Prefer composition over inheritance.
+- Break down complex components into smaller, reusable pieces.
+- Use compound components pattern for related UI elements.
+- Extract logic into custom hooks when components become too complex.
+
+### Component Organization
+```typescript
+// Component file structure:
+// 1. Imports (external, internal, types)
+// 2. Type definitions
+// 3. Component implementation
+// 4. Sub-components (if any)
+// 5. Exports
+```
+
+### Props Design
+- Use TypeScript interfaces for all component props.
+- Prefer explicit prop types over `any`.
+- Use default props or default parameter values.
+- Destructure props at the function signature level.
+- Document props with JSDoc comments.
+
+### Children Pattern
+- Use `React.ReactNode` for flexible children.
+- Prefer explicit children prop over implicit children.
+- Use render props pattern when appropriate for complex logic.
+
+## 5. Performance Optimization
+
+### React.memo
+- Use `React.memo` for components that receive stable props.
+- Avoid memoizing components that receive frequently changing props.
+- Memoize expensive components in lists to prevent unnecessary re-renders.
+
+### useMemo
+- Use `useMemo` for expensive computations.
+- Memoize derived values that are used in multiple places.
+- Avoid overusing `useMemo` for simple calculations.
+- Dependencies array must include all referenced values.
+
+### useCallback
+- Use `useCallback` for functions passed as props to memoized components.
+- Use `useCallback` for event handlers in lists to prevent re-renders.
+- Avoid `useCallback` for functions that are only used once.
+- Dependencies array must include all referenced values.
+
+### Code Splitting
+- Use React Router v7's lazy loading for route components.
+- Split large components into separate chunks when appropriate.
+- Use dynamic imports for heavy dependencies.
+
+### List Rendering
+- Always use `key` prop with stable, unique identifiers.
+- Avoid using array index as key when items can be reordered.
+- Use `React.memo` for list item components when appropriate.
+- Implement virtual scrolling for very long lists.
+
+## 6. Error Boundaries and Error Handling
+
+### Error Boundaries
+- Wrap route components with ErrorBoundary components.
+- Use React Router v7's built-in ErrorBoundary for route-level errors.
+- Create specific error boundaries for critical sections.
+- Provide user-friendly error messages and recovery options.
+
+### Error Handling Patterns
+- Handle errors at the appropriate level (component, hook, or route).
+- Use try-catch blocks for async operations.
+- Display error states in UI with clear messaging.
+- Log errors for debugging (avoid logging sensitive data).
+- Provide fallback UI for error states.
+
+### Error State Management
+- Use React Query's error handling for API errors.
+- Create reusable error display components.
+- Distinguish between different error types (network, validation, server).
+- Provide actionable error messages to users.
+
+## 7. Loading States and Suspense Patterns
+
+### Loading States
+- Always show loading indicators for async operations.
+- Use React Query's `isLoading` and `isFetching` states.
+- Implement skeleton screens for better perceived performance.
+- Avoid showing loading states for cached data when possible.
+
+### Suspense Integration
+- Use React Router v7 loaders with Suspense boundaries.
+- Wrap async components with Suspense for code-split routes.
+- Provide meaningful fallback UI for Suspense boundaries.
+- Use Suspense for data fetching in React Query when appropriate.
+
+### Loading Patterns
+- Show inline loading states for mutations.
+- Use optimistic updates when appropriate.
+- Implement progressive loading for large datasets.
+- Avoid blocking the entire UI for loading states.
+
+## 8. Form Handling Best Practices
+
+### Form State Management
+- Use controlled components for form inputs.
+- Implement proper validation before submission.
+- Show validation errors inline near the relevant fields.
+- Disable submit button during submission to prevent double-submission.
+
+### Form Validation
+- Validate on blur and submit events.
+- Provide clear, actionable error messages.
+- Use TypeScript types for form data.
+- Consider using form libraries (React Hook Form) for complex forms.
+
+### Form Submission
+- Handle async form submissions properly.
+- Show loading state during submission.
+- Handle success and error states.
+- Reset form after successful submission when appropriate.
+
+### Accessibility in Forms
+- Associate labels with inputs using `htmlFor` and `id`.
+- Use `aria-describedby` for error messages.
+- Mark required fields appropriately.
+- Provide clear instructions for form completion.
+
+## 9. Accessibility (a11y) Guidelines
+
+### Semantic HTML
+- Use semantic HTML elements (`<nav>`, `<main>`, `<article>`, etc.).
+- Use proper heading hierarchy (h1, h2, h3, etc.).
+- Use `<button>` for actions, not `<div>` with onClick.
+- Use `<a>` for navigation, not `<div>` with onClick.
+
+### ARIA Attributes
+- Use ARIA attributes when semantic HTML is insufficient.
+- Use `aria-label` for icon-only buttons.
+- Use `aria-describedby` for additional context.
+- Use `aria-live` regions for dynamic content updates.
+- Avoid redundant ARIA attributes when semantic HTML is sufficient.
+
+### Keyboard Navigation
+- Ensure all interactive elements are keyboard accessible.
+- Implement proper focus management.
+- Use visible focus indicators.
+- Support keyboard shortcuts for common actions.
+
+### Screen Reader Support
+- Provide alternative text for images.
+- Use descriptive link text (avoid "click here").
+- Announce dynamic content changes.
+- Test with screen readers regularly.
+
+### Color and Contrast
+- Ensure sufficient color contrast (WCAG AA minimum).
+- Don't rely solely on color to convey information.
+- Provide visual indicators beyond color.
+
+## 10. TypeScript Best Practices for React
+
+### Type Definitions
+- Define explicit types for all component props.
+- Use TypeScript interfaces for component props.
+- Avoid using `any` type; use `unknown` when type is truly unknown.
+- Use type inference when types are obvious.
+
+### React Type Patterns
+```typescript
+// Component props
+interface ComponentProps {
+  title: string;
+  count?: number;
+  onAction: (id: string) => void;
+}
+
+// Event handlers
+const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  // ...
+};
+
+// Ref types
+const inputRef = useRef<HTMLInputElement>(null);
+```
+
+### Type Safety
+- Use strict TypeScript configuration.
+- Leverage TypeScript's type inference when possible.
+- Use type guards for runtime type checking.
+- Extract common types to shared type files.
+
+### Generic Components
+- Use generics for reusable components with varying types.
+- Document generic type parameters clearly.
+- Provide sensible default types when possible.
+
+## 11. Code Organization and File Structure
+
+### File Structure
+```
+app/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   └── features/       # Feature-specific components
+├── hooks/              # Custom React hooks
+│   └── api/           # API-related hooks
+├── lib/               # Utility functions and configurations
+│   ├── api-client.ts  # API client setup
+│   ├── query-client.ts # React Query setup
+│   └── utils.ts       # Utility functions
+├── types/             # TypeScript type definitions
+│   └── api-types.ts   # Generated API types
+└── routes/            # Route components
+```
+
+### Naming Conventions
+- Use PascalCase for component files and components.
+- Use camelCase for hooks, utilities, and functions.
+- Use kebab-case for route files.
+- Use descriptive, meaningful names.
+
+### File Organization
+- One component per file (except for closely related sub-components).
+- Co-locate related files (component, styles, tests, types).
+- Keep files focused and avoid overly large files.
+- Group related exports in index files when appropriate.
+
+### Import Organization
+```typescript
+// 1. External dependencies
+import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+// 2. Internal absolute imports
+import { Button } from '~/components/ui/button';
+import { useRooms } from '~/hooks/api/useRooms';
+
+// 3. Relative imports
+import { formatDate } from '../utils/date';
+import type { Room } from '../types';
+```
+
+## 12. Testing Considerations
+
+### Component Testing
+- Test component rendering and user interactions.
+- Test error states and edge cases.
+- Test accessibility features.
+- Use React Testing Library for component tests.
+
+### Hook Testing
+- Test custom hooks in isolation.
+- Test hook return values and side effects.
+- Test error handling in hooks.
+- Use `@testing-library/react-hooks` for hook testing.
+
+### Integration Testing
+- Test complete user flows.
+- Test API integration with mocked responses.
+- Test form submissions and validations.
+- Test error recovery flows.
+
+### Test Organization
+- Co-locate test files with source files.
+- Use descriptive test names.
+- Follow AAA pattern (Arrange, Act, Assert).
+- Keep tests focused and independent.
+
+## 13. Security Best Practices
+
+### XSS Prevention
+- Never use `dangerouslySetInnerHTML` unless absolutely necessary.
+- Sanitize user input before rendering.
+- Use React's built-in escaping (automatic for JSX).
+- Validate and sanitize data from external sources.
+
+### Input Validation
+- Validate all user inputs on the client side.
+- Never trust client-side validation alone (backend must validate).
+- Use TypeScript types for input validation.
+- Provide clear validation error messages.
+
+### Authentication
+- Store JWT tokens securely (httpOnly cookies preferred).
+- Never store sensitive data in localStorage.
+- Implement proper token refresh logic.
+- Handle authentication errors gracefully.
+
+### Data Handling
+- Sanitize data before sending to API.
+- Avoid exposing sensitive data in client-side code.
+- Use environment variables for API URLs and keys.
+- Implement proper CORS handling.
+
+### Content Security
+- Use Content Security Policy headers.
+- Avoid inline scripts and styles.
+- Use nonce or hash for inline content when necessary.
+- Regularly audit dependencies for vulnerabilities.
+
+## 14. Performance & Routing
+
+### React Router v7
+- Use React Router v7 loaders for pre-fetching data when possible.
+- Implement proper route-level code splitting.
+- Use route-level error boundaries.
+- Leverage route-level loading states.
+
+### Data Fetching
+- Prefer React Query for server state management.
+- Use loaders for initial page data.
+- Implement proper cache invalidation strategies.
+- Use optimistic updates for better UX.
+
+### Suspense and Error Boundaries
+- Use `Suspense` for async components and data fetching.
+- Use `ErrorBoundary` for a "fail-safe" user experience.
+- Provide meaningful fallback UI.
+- Implement error recovery mechanisms.
+
+## 15. Code Quality Standards
+
+### Function Design
+- Keep functions short and focused on a single responsibility.
+- Use descriptive function names.
+- Avoid nested if statements (use early returns).
+- Avoid using `else` when possible (use early returns).
+- Avoid nested loops when possible.
+
+### Code Efficiency
+- Use the most efficient code possible.
+- Avoid unnecessary re-renders.
+- Optimize expensive operations.
+- Use appropriate data structures.
+
+### Documentation
+- Add JSDoc comments to all functions, methods, and classes.
+- Document complex logic and business rules.
+- Include parameter and return type documentation.
+- Keep documentation up-to-date with code changes.
+
+### String Handling
+- Use template literals for string concatenation in JavaScript/TypeScript.
+- Use double quotes only in HTML or HTML templates.
+- Use single quotes for JavaScript/TypeScript strings.
+
+## 16. Additional Best Practices
+
+### State Management
+- Use React Query for server state.
+- Use React state (useState, useReducer) for local UI state.
+- Avoid prop drilling; use context or state management when needed.
+- Keep state as close to where it's used as possible.
+
+### Side Effects
+- Use `useEffect` for side effects only.
+- Clean up side effects properly (return cleanup function).
+- Avoid side effects in render functions.
+- Use proper dependency arrays in useEffect.
+
+### Refs
+- Use refs for DOM access when necessary.
+- Use refs for imperative handles.
+- Avoid using refs for values that should trigger re-renders.
+- Use `useRef` for values that persist across renders without causing re-renders.
+
+### Context
+- Use Context for truly global state.
+- Split contexts by concern (auth, theme, etc.).
+- Avoid overusing Context (can cause performance issues).
+- Provide proper TypeScript types for context values.
