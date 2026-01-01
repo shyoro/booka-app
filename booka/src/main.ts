@@ -11,7 +11,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Vite default port
+    credentials: true,
+  });
 
   // Set global prefix
   app.setGlobalPrefix('api/v1');
@@ -55,11 +58,19 @@ async function bootstrap() {
     },
   });
 
+  // Expose OpenAPI JSON for frontend
+  app.getHttpAdapter().get('/api-json', (req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.send(document);
+  });
+
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
   console.log(`Application is running on: http://localhost:${port}`);
   console.log(`Swagger documentation available at: http://localhost:${port}/api`);
+  console.log(`OpenAPI JSON spec available at: http://localhost:${port}/api-json`);
 }
 
 bootstrap();
