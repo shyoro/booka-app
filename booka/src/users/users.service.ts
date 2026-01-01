@@ -25,7 +25,8 @@ export class UsersService {
    * @returns User or null if not found
    */
   async findById(id: number) {
-    const [user] = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    const queryResult = await this.db.select().from(users).where(eq(users.id, id)).limit(1);
+    const [user] = queryResult;
 
     if (!user) {
       return null;
