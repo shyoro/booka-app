@@ -11,6 +11,8 @@ import { useState } from "react";
 
 import type { Route } from "./+types/root";
 import { createQueryClient } from "./lib/query-client";
+import { AuthProvider } from "./contexts/AuthContext";
+import { Toaster } from "./components/ui/sonner";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -50,7 +52,10 @@ export default function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthProvider>
+        <Outlet />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
