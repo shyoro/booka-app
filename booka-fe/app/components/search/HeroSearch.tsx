@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { Calendar } from '~/components/ui/calendar';
@@ -9,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { Slider } from '~/components/ui/slider';
 import { MapPin, Users, Search, Calendar as CalendarIcon, DollarSign } from 'lucide-react';
 import { cn } from '~/lib/utils';
-import { useDebounce } from '~/hooks/useDebounce';
+import { useLocations } from '~/hooks/api/useRooms';
 
 export interface SearchParams {
   location?: string;
@@ -28,8 +27,10 @@ interface HeroSearchProps {
 /**
  * Hero search component with location, date range, guests selector, and price range
  */
+const ANY_LOCATION_VALUE = '__any__';
+
 export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
-  const [location, setLocation] = useState(initialParams?.location || '');
+  const [location, setLocation] = useState<string>(initialParams?.location || ANY_LOCATION_VALUE);
   const [checkIn, setCheckIn] = useState<Date | undefined>(
     initialParams?.dateFrom ? new Date(initialParams.dateFrom) : undefined
   );
@@ -42,10 +43,10 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
     initialParams?.maxPrice || 2000,
   ]);
 
-  const debouncedLocation = useDebounce(location, 300);
+  const { data: locations = [], isLoading: isLoadingLocations } = useLocations();
 
   useEffect(() => {
-    setLocation(initialParams?.location || '');
+    setLocation(initialParams?.location || ANY_LOCATION_VALUE);
     setCheckIn(initialParams?.dateFrom ? new Date(initialParams.dateFrom) : undefined);
     setCheckOut(initialParams?.dateTo ? new Date(initialParams.dateTo) : undefined);
     setCapacity(initialParams?.capacity?.toString() || '');
@@ -56,8 +57,10 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
   }, [initialParams]);
 
   const handleSearch = () => {
+    const isAnyLocation = location === ANY_LOCATION_VALUE;
+    const searchLocation = isAnyLocation ? undefined : location;
     onSearch({
-      location: debouncedLocation || undefined,
+      location: searchLocation,
       dateFrom: checkIn ? format(checkIn, 'yyyy-MM-dd') : undefined,
       dateTo: checkOut ? format(checkOut, 'yyyy-MM-dd') : undefined,
       capacity: capacity ? parseInt(capacity) : undefined,
@@ -80,12 +83,19 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
               <MapPin className="h-4 w-4" />
               Location
             </Label>
-            <Input
-              id="location"
-              placeholder="Where are you going?"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
+            <Select value={location} onValueChange={setLocation} disabled={isLoadingLocations}>
+              <SelectTrigger id="location" className="w-full">
+                <SelectValue placeholder="Where are you going?" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                <SelectItem value={ANY_LOCATION_VALUE}>Any Location</SelectItem>
+                {locations.map((loc) => (
+                  <SelectItem key={loc} value={loc}>
+                    {loc}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2 min-w-0" data-filter="checkIn">

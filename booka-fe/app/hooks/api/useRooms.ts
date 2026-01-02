@@ -7,6 +7,7 @@ type Room = NonNullable<NonNullable<SearchRoomsResponse['data']>['data']>[0];
 type SearchParams = paths['/api/v1/rooms']['get']['parameters']['query'];
 type RoomDetailsResponse = paths['/api/v1/rooms/{id}']['get']['responses'][200]['content']['application/json'];
 type AvailabilityResponse = paths['/api/v1/rooms/{id}/availability']['get']['responses'][200]['content']['application/json'];
+type LocationsResponse = paths['/api/v1/rooms/locations']['get']['responses'][200]['content']['application/json'];
 
 export type { Room };
 
@@ -95,6 +96,54 @@ export function useRoomAvailability(id: number, dateFrom: string, dateTo: string
       return data.data;
     },
     enabled: !!id && !!dateFrom && !!dateTo,
+  });
+}
+
+/**
+ * Hook to fetch all unique room locations with memoization and localStorage caching
+ * @returns Query result with locations array
+ */
+export function useLocations() {
+  const STORAGE_KEY = 'booka_locations';
+
+  return useQuery({
+    queryKey: ['rooms', 'locations'],
+    queryFn: async () => {
+      // Check localStorage first
+      const cached = localStorage.getItem(STORAGE_KEY);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        } catch {
+          // Invalid cache, continue to fetch
+        }
+      }
+
+      // Fetch from API
+      const { data, error } = await apiClient.GET('/api/v1/rooms/locations');
+
+      if (error) {
+        throw new Error('Failed to fetch locations');
+      }
+
+      if (!data?.success || !data.data?.locations) {
+        throw new Error('Invalid response format');
+      }
+
+      const locations = data.data.locations;
+
+      // Store in localStorage
+      if (locations.length > 0) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(locations));
+      }
+
+      return locations;
+    },
+    staleTime: 24 * 60 * 60 * 1000, // 24 hours
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
   });
 }
 
