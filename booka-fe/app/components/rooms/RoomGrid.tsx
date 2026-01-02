@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { RoomCard } from './RoomCard';
 import { RoomSkeleton } from './RoomSkeleton';
@@ -8,6 +9,9 @@ import { Search } from 'lucide-react';
 interface RoomGridProps {
   rooms: Room[];
   isLoading?: boolean;
+  isFetchingNextPage?: boolean;
+  hasNextPage?: boolean;
+  fetchNextPage?: () => void;
   emptyMessage?: string;
   searchParams?: SearchParams;
 }
@@ -23,13 +27,52 @@ const containerVariants = {
 };
 
 /**
- * Room grid component with responsive layout and animations
+ * Room grid component with responsive layout, animations, and infinite scrolling
  */
-export function RoomGrid({ rooms, isLoading, emptyMessage = 'No rooms found', searchParams }: RoomGridProps) {
+export function RoomGrid({
+  rooms,
+  isLoading,
+  isFetchingNextPage = false,
+  hasNextPage = false,
+  fetchNextPage,
+  emptyMessage = 'No rooms found',
+  searchParams,
+}: RoomGridProps) {
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!fetchNextPage || !hasNextPage || isFetchingNextPage) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      {
+        rootMargin: '100px',
+      },
+    );
+
+    const currentSentinel = sentinelRef.current;
+    if (currentSentinel) {
+      observer.observe(currentSentinel);
+    }
+
+    return () => {
+      if (currentSentinel) {
+        observer.unobserve(currentSentinel);
+      }
+    };
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: 20 }).map((_, i) => (
           <RoomSkeleton key={i} />
         ))}
       </div>
@@ -46,16 +89,28 @@ export function RoomGrid({ rooms, isLoading, emptyMessage = 'No rooms found', se
   }
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-    >
-      {rooms.map((room) => (
-        <RoomCard key={room.id} room={room} searchParams={searchParams} />
-      ))}
-    </motion.div>
+    <>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+      >
+        {rooms.map((room) => (
+          <RoomCard key={room.id} room={room} searchParams={searchParams} />
+        ))}
+      </motion.div>
+      {hasNextPage && (
+        <div ref={sentinelRef} className="h-4" aria-hidden="true" />
+      )}
+      {isFetchingNextPage && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-6">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <RoomSkeleton key={`skeleton-${i}`} />
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 

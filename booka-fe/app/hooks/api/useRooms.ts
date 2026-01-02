@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useInfiniteQuery } from '@tanstack/react-query';
 import apiClient from '~/lib/api-client';
 import type { paths } from '~/types/api-types';
 
@@ -36,6 +36,53 @@ export function useSearchRooms(params?: SearchParams) {
         rooms: data.data.data || [],
         pagination: data.data.pagination,
       };
+    },
+  });
+}
+
+/**
+ * Hook to search for rooms with infinite scrolling pagination
+ * @param params - Search parameters (location, dates, capacity, etc.)
+ * @returns Infinite query result with rooms data
+ */
+export function useInfiniteSearchRooms(params?: SearchParams) {
+  return useInfiniteQuery({
+    queryKey: ['rooms', 'search', 'infinite', params],
+    queryFn: async ({ pageParam = 1 }) => {
+      const { data, error } = await apiClient.GET('/api/v1/rooms', {
+        params: {
+          query: {
+            ...params,
+            page: pageParam,
+            limit: 20,
+          },
+        },
+      });
+
+      if (error) {
+        throw new Error('Failed to fetch rooms');
+      }
+
+      if (!data?.success || !data.data) {
+        throw new Error('Invalid response format');
+      }
+
+      return {
+        rooms: data.data.data || [],
+        pagination: data.data.pagination,
+      };
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      const { pagination } = lastPage;
+      if (!pagination) {
+        return undefined;
+      }
+      const { page, totalPages } = pagination;
+      if (page < totalPages) {
+        return page + 1;
+      }
+      return undefined;
     },
   });
 }

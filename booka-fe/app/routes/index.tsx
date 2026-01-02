@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Navbar } from '~/components/layout/Navbar';
 import { HeroSearch, type SearchParams } from '~/components/search/HeroSearch';
 import { RoomGrid } from '~/components/rooms/RoomGrid';
-import { useSearchRooms } from '~/hooks/api/useRooms';
+import { useInfiniteSearchRooms } from '~/hooks/api/useRooms';
 
 export function meta() {
   return [
@@ -34,15 +34,19 @@ export default function Index() {
   
   const searchFilters = parseSearchParams(searchParams);
 
-  const { data, isLoading } = useSearchRooms({
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteSearchRooms({
     location: searchFilters.location,
     dateFrom: searchFilters.dateFrom,
     dateTo: searchFilters.dateTo,
     capacity: searchFilters.capacity,
     minPrice: searchFilters.minPrice,
     maxPrice: searchFilters.maxPrice,
-    limit: searchFilters.location || searchFilters.dateFrom ? undefined : 5,
-    page: 1,
   });
 
   const handleSearch = (params: SearchParams) => {
@@ -58,7 +62,7 @@ export default function Index() {
     setSearchParams(newParams, { replace: true });
   };
 
-  const rooms = data?.rooms || [];
+  const rooms = data?.pages.flatMap((page) => page.rooms) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
@@ -85,7 +89,14 @@ export default function Index() {
           <h2 className="text-3xl font-bold mb-8">
             {searchFilters.location || searchFilters.dateFrom ? 'Search Results' : 'Featured Rooms'}
           </h2>
-          <RoomGrid rooms={rooms} isLoading={isLoading} searchParams={searchFilters} />
+          <RoomGrid
+            rooms={rooms}
+            isLoading={isLoading}
+            isFetchingNextPage={isFetchingNextPage}
+            hasNextPage={hasNextPage}
+            fetchNextPage={fetchNextPage}
+            searchParams={searchFilters}
+          />
         </section>
       </main>
     </div>
