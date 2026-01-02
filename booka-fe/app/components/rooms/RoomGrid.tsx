@@ -2,12 +2,14 @@ import { motion } from 'framer-motion';
 import { RoomCard } from './RoomCard';
 import { RoomSkeleton } from './RoomSkeleton';
 import type { Room } from '~/hooks/api/useRooms';
+import type { SearchParams } from '~/components/search/HeroSearch';
 import { Search } from 'lucide-react';
 
 interface RoomGridProps {
   rooms: Room[];
   isLoading?: boolean;
   emptyMessage?: string;
+  searchParams?: SearchParams;
 }
 
 const containerVariants = {
@@ -23,7 +25,7 @@ const containerVariants = {
 /**
  * Room grid component with responsive layout and animations
  */
-export function RoomGrid({ rooms, isLoading, emptyMessage = 'No rooms found' }: RoomGridProps) {
+export function RoomGrid({ rooms, isLoading, emptyMessage = 'No rooms found', searchParams }: RoomGridProps) {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -52,7 +54,7 @@ export function RoomGrid({ rooms, isLoading, emptyMessage = 'No rooms found' }: 
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
     >
       {rooms.map((room) => (
-        <RoomCard key={room.id} room={room} />
+        <RoomCard key={room.id} room={room} searchParams={searchParams} />
       ))}
     </motion.div>
   );

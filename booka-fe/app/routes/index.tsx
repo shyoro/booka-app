@@ -85,7 +85,7 @@ export default function Index() {
           <h2 className="text-3xl font-bold mb-8">
             {searchFilters.location || searchFilters.dateFrom ? 'Search Results' : 'Featured Rooms'}
           </h2>
-          <RoomGrid rooms={rooms} isLoading={isLoading} />
+          <RoomGrid rooms={rooms} isLoading={isLoading} searchParams={searchFilters} />
         </section>
       </main>
     </div>

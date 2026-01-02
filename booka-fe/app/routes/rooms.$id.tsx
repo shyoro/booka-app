@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router';
-import { format } from 'date-fns';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router';
+import { format, parseISO } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Navbar } from '~/components/layout/Navbar';
 import { Button } from '~/components/ui/button';
@@ -24,15 +24,71 @@ import { MapPin, Users, Calendar as CalendarIcon, DollarSign } from 'lucide-reac
  */
 export default function RoomDetails() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const roomId = id ? Number(id) : 0;
   const { data: roomData, isLoading, error } = useRoomDetails(roomId);
   const room = roomData;
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [checkIn, setCheckIn] = useState<Date | undefined>();
-  const [checkOut, setCheckOut] = useState<Date | undefined>();
+  
+  /**
+   * Parse date from search params
+   */
+  const parseDateFromParams = (dateStr: string | null): Date | undefined => {
+    if (!dateStr) return undefined;
+    const parsed = parseISO(dateStr);
+    return !isNaN(parsed.getTime()) ? parsed : undefined;
+  };
+
+  /**
+   * Build back URL with all preserved search params
+   */
+  const buildBackUrl = (): string => {
+    const params = new URLSearchParams();
+    const location = searchParams.get('location');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    const capacity = searchParams.get('capacity');
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    
+    if (location) params.set('location', location);
+    if (dateFrom) params.set('dateFrom', dateFrom);
+    if (dateTo) params.set('dateTo', dateTo);
+    if (capacity) params.set('capacity', capacity);
+    if (minPrice) params.set('minPrice', minPrice);
+    if (maxPrice) params.set('maxPrice', maxPrice);
+    
+    const queryString = params.toString();
+    return queryString ? `/?${queryString}` : '/';
+  };
+
+  const [checkIn, setCheckIn] = useState<Date | undefined>(() => 
+    parseDateFromParams(searchParams.get('dateFrom'))
+  );
+  const [checkOut, setCheckOut] = useState<Date | undefined>(() => 
+    parseDateFromParams(searchParams.get('dateTo'))
+  );
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const createBooking = useCreateBooking();
+
+  /**
+   * Update dates when search params change
+   */
+  useEffect(() => {
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    
+    const newCheckIn = parseDateFromParams(dateFrom);
+    const newCheckOut = parseDateFromParams(dateTo);
+    
+    if (newCheckIn) {
+      setCheckIn(newCheckIn);
+    }
+    if (newCheckOut) {
+      setCheckOut(newCheckOut);
+    }
+  }, [searchParams]);
 
   const dateFrom = checkIn ? format(checkIn, 'yyyy-MM-dd') : undefined;
   const dateTo = checkOut ? format(checkOut, 'yyyy-MM-dd') : undefined;
@@ -126,7 +182,10 @@ export default function RoomDetails() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/" className="text-muted-foreground hover:text-foreground mb-6 inline-block">
+        <Link 
+          to={buildBackUrl()}
+          className="text-muted-foreground hover:text-foreground mb-6 inline-block"
+        >
           ← Back to search
         </Link>
 

@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
 import { Badge } from '~/components/ui/badge';
-import { MapPin, Calendar, DollarSign } from 'lucide-react';
+import { MapPin, Calendar } from 'lucide-react';
 import type { Booking } from '~/hooks/api/useBookings';
 import { formatDateRange, isDateInPast, isDateInFuture } from '~/lib/date-utils';
 import { cn } from '~/lib/utils';
@@ -40,13 +40,13 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
     >
       <Card
         className={cn(
-          'rounded-2xl shadow-xl overflow-hidden transition-all duration-300',
+          'rounded-2xl shadow-xl overflow-hidden transition-all duration-300 pt-0',
           isUpcoming && 'bg-white dark:bg-gray-800 border-2 border-primary',
           isPast && 'bg-gray-100 dark:bg-gray-900 opacity-60',
           isCancelled && 'border-2 border-destructive opacity-75'
         )}
       >
-        <div className="relative h-48 w-full overflow-hidden">
+        <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
           <img
             src={imageUrl}
             alt={roomName}
@@ -84,14 +84,13 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </Badge>
             <div className="flex items-center">
-              <DollarSign className="h-4 w-4 mr-1 text-muted-foreground" />
               <span
                 className={cn(
                   'text-2xl font-bold',
                   isCancelled && 'line-through text-muted-foreground'
                 )}
               >
-                ${totalPrice.toFixed(2)}
+                ${Math.round(totalPrice)}
               </span>
             </div>
           </div>
@@ -101,7 +100,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
           <CardFooter>
             <Button
               variant="destructive"
-              className="w-full"
+              className="w-full border border-destructive/20"
               onClick={() => onCancel(booking.id!)}
             >
               Cancel Reservation

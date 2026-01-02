@@ -5,18 +5,50 @@ import { Badge } from '~/components/ui/badge';
 import { MapPin, Users } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import type { Room } from '~/hooks/api/useRooms';
+import type { SearchParams } from '~/components/search/HeroSearch';
 
 interface RoomCardProps {
   room: Room;
   onBook?: (roomId: number) => void;
+  searchParams?: SearchParams;
 }
 
 /**
  * Room card component with glassmorphism styling and animations
  */
-export function RoomCard({ room, onBook }: RoomCardProps) {
+export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
   const imageUrl = room.images && room.images.length > 0 ? room.images[0] : '/placeholder-room.jpg';
   const price = parseFloat(room.pricePerNight || '0');
+
+  /**
+   * Build URL with all search params to preserve search context
+   */
+  const buildRoomUrl = () => {
+    const baseUrl = `/rooms/${room.id}`;
+    const params = new URLSearchParams();
+    
+    if (searchParams?.location) {
+      params.set('location', searchParams.location);
+    }
+    if (searchParams?.dateFrom) {
+      params.set('dateFrom', searchParams.dateFrom);
+    }
+    if (searchParams?.dateTo) {
+      params.set('dateTo', searchParams.dateTo);
+    }
+    if (searchParams?.capacity) {
+      params.set('capacity', searchParams.capacity.toString());
+    }
+    if (searchParams?.minPrice) {
+      params.set('minPrice', searchParams.minPrice.toString());
+    }
+    if (searchParams?.maxPrice) {
+      params.set('maxPrice', searchParams.maxPrice.toString());
+    }
+    
+    const queryString = params.toString();
+    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
+  };
 
   return (
     <motion.div
@@ -25,7 +57,7 @@ export function RoomCard({ room, onBook }: RoomCardProps) {
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.2 }}
     >
-      <Link to={`/rooms/${room.id}`} className="block">
+      <Link to={buildRoomUrl()} className="block">
         <Card
           className={cn(
             // Layout
