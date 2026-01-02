@@ -187,7 +187,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                     : `$${priceRange[0]} - $${priceRange[1]}`}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-80 p-4" align="start">
+              <PopoverContent className="w-80 p-4 bg-white/10 backdrop-blur-md border-white/20 data-[state=open]:border-primary/50 data-[state=open]:shadow-lg data-[state=open]:shadow-primary/20" align="start">
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
