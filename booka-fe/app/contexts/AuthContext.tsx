@@ -27,11 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
-    if (token) {
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
-    }
+    setIsLoading(false);
   }, []);
 
   const login = async (email: string, password: string): Promise<void> => {
