@@ -64,8 +64,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
   let stack: string | undefined;
-  let shouldShowError = true;
 
+  // Handle route errors
   if (isRouteErrorResponse(error)) {
     const status = error.status;
 
@@ -73,28 +73,21 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     if (status === 404 && typeof window !== 'undefined') {
       const pathname = window.location.pathname;
       if (pathname.startsWith('/.well-known/')) {
-        shouldShowError = false;
+        return null;
       }
     }
 
-    if (shouldShowError) {
-      message = status === 404 ? "404" : "Error";
-      details =
-        status === 404
-          ? "The requested page could not be found."
-          : error.statusText || details;
-    }
+    message = status === 404 ? "404" : "Error";
+    details =
+      status === 404
+        ? "The requested page could not be found."
+        : error.statusText || details;
   }
 
+  // Handle non-route errors in development
   if (!isRouteErrorResponse(error) && import.meta.env.DEV && error && error instanceof Error) {
-    // Only show error details in development for non-route errors
     details = error.message;
     stack = error.stack;
-  }
-
-  // Don't render error UI for well-known paths
-  if (!shouldShowError) {
-    return null;
   }
 
   return (
