@@ -4,6 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card'
 import { Button } from '~/components/ui/button';
 import { Badge } from '~/components/ui/badge';
 import { MapPin, Users } from 'lucide-react';
+import { cn } from '~/lib/utils';
 import type { Room } from '~/hooks/api/useRooms';
 
 interface RoomCardProps {
@@ -26,7 +27,18 @@ export function RoomCard({ room, onBook }: RoomCardProps) {
       transition={{ duration: 0.2 }}
     >
       <Link to={`/rooms/${room.id}`} className="block">
-        <Card className="bg-white/10 dark:bg-gray-900/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden h-full flex flex-col cursor-pointer group p-0">
+        <Card
+          className={cn(
+            // Layout
+            'flex flex-col h-full',
+            // Box model
+            'p-0 overflow-hidden',
+            // Visuals
+            'bg-white/10 dark:bg-gray-900/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl',
+            // Interactive states
+            'cursor-pointer group hover:shadow-2xl transition-all duration-300'
+          )}
+        >
           <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
             <img
               src={imageUrl}

@@ -47,7 +47,14 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl p-6 md:p-8">
+    <div
+      className={cn(
+        // Box model
+        'p-6 md:p-8',
+        // Visuals
+        'bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl'
+      )}
+    >
       <div className="flex flex-col md:flex-row md:items-end gap-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
           <div className="space-y-2">

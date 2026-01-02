@@ -1,12 +1,20 @@
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
 import { Skeleton } from '~/components/ui/skeleton';
+import { cn } from '~/lib/utils';
 
 /**
  * Skeleton loader component matching RoomCard layout
  */
 export function RoomSkeleton() {
   return (
-    <Card className="bg-white/10 dark:bg-gray-900/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl overflow-hidden">
+    <Card
+      className={cn(
+        // Box model
+        'overflow-hidden',
+        // Visuals
+        'bg-white/10 dark:bg-gray-900/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl'
+      )}
+    >
       <Skeleton className="h-48 w-full rounded-t-2xl" />
       <CardHeader>
         <Skeleton className="h-6 w-3/4" />

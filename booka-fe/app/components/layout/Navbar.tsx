@@ -5,6 +5,7 @@ import { Button } from '~/components/ui/button';
 import { useAuth } from '~/hooks/useAuth';
 import { useLogout } from '~/hooks/api/useAuthMutations';
 import { AuthDialog } from '~/components/auth/AuthDialog';
+import { cn } from '~/lib/utils';
 import { User, LogOut, Menu, X } from 'lucide-react';
 
 /**
@@ -22,7 +23,18 @@ export function Navbar() {
 
   return (
     <>
-      <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-white/20 shadow-lg">
+      <nav
+        className={cn(
+          // Position
+          'sticky top-0 z-50',
+          // Layout
+          'w-full',
+          // Box model
+          'border-b border-white/20',
+          // Visuals
+          'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-lg'
+        )}
+      >
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
