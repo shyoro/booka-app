@@ -32,6 +32,36 @@ You are an expert React developer specializing in high-performance SPAs.
 - Use the `cn()` utility for all conditional class merging (from `app/lib/utils.ts`).
 - Keep components small and focused on a single responsibility.
 
+# Tailwind CSS Development Rules
+
+### 1. Class Organization & Grouping
+To ensure scannability, always organize utility classes in the following logical sequence:
+1. **Layout & Positioning:** `display`, `position`, `z-index`, `top/right/bottom/left`.
+2. **Box Model:** `width`, `height`, `margin`, `padding`, `gap`.
+3. **Typography:** `font-size`, `font-weight`, `text-align`, `text-color`.
+4. **Visuals:** `background-color`, `border`, `border-radius`, `box-shadow`, `opacity`.
+5. **Interactive States:** `hover:`, `focus:`, `active:`, `disabled:`.
+6. **Complex/Special Variants:** `aria-`, `dark:`, and arbitrary variants (e.g., `[&_svg]`).
+
+### 2. Elimination of Redundancy
+Perform a strict redundancy check before outputting class strings:
+- **Focus States:** Do not use `outline-none` if `focus:ring` or `focus-visible:ring` is already defined; the ring utility handles the focus indicator.
+- **Default Behaviors:** Omit classes that represent browser defaults (e.g., do not use `flex-row` or `shrink` unless overriding an inherited style).
+- **Property Conflicts:** Ensure only one utility per CSS property is applied. Avoid stacking multiple shadows or conflicting opacity levels.
+- **Transitions:** Use `transition` by default. Only use `transition-all` if specific non-standard properties require animation.
+
+### 3. Simplification of Arbitrary Variants
+- **Direct Application:** Avoid long parent-level selectors like `[&_svg:not...]:size-4`. Apply classes directly to the child element whenever possible.
+- **Minimal Selectors:** If arbitrary variants are necessary, use the simplest possible selector (e.g., `[&_svg]:size-4` instead of complex conditional logic).
+
+### 4. Readability & Formatting
+- **Multi-line Strings:** For elements requiring more than 10 classes, use multi-line template literals or logical line breaks to group related categories.
+- **Extraction Threshold:** If an element exceeds 15 utility classes, suggest extracting the styles into a reusable component or a CSS `@layer components` class to prevent "class soup."
+
+### 5. Interaction Consistency
+- **Tactile Feedback:** When creating "raised" or 3D effects, ensure that `hover` (lifting) and `active` (pressing) states are balanced to create a consistent physical metaphor.
+- **State Transitions:** Always include a standard duration and easing utility when using hover or active state transforms.
+
 ## 4. Component Composition Patterns
 
 ### Component Structure

@@ -48,106 +48,108 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
 
   return (
     <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl p-6 md:p-8">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="location" className="flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            Location
-          </Label>
-          <Input
-            id="location"
-            placeholder="Where are you going?"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-          />
+      <div className="flex flex-col md:flex-row md:items-end gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
+          <div className="space-y-2">
+            <Label htmlFor="location" className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Location
+            </Label>
+            <Input
+              id="location"
+              placeholder="Where are you going?"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4" />
+              Check-in
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'w-full justify-start text-left font-normal',
+                    !checkIn && 'text-muted-foreground'
+                  )}
+                >
+                  {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={checkIn}
+                  onSelect={setCheckIn}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4" />
+              Check-out
+            </Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'w-full justify-start text-left font-normal',
+                    !checkOut && 'text-muted-foreground'
+                  )}
+                >
+                  {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={checkOut}
+                  onSelect={setCheckOut}
+                  disabled={(date) => (checkIn ? date <= checkIn : date < new Date())}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="guests" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Guests
+            </Label>
+            <Select value={capacity} onValueChange={setCapacity}>
+              <SelectTrigger id="guests">
+                <SelectValue placeholder="Guests" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="1">1 guest</SelectItem>
+                <SelectItem value="2">2 guests</SelectItem>
+                <SelectItem value="3">3 guests</SelectItem>
+                <SelectItem value="4">4 guests</SelectItem>
+                <SelectItem value="5">5+ guests</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        <div className="space-y-2">
-          <Label className="flex items-center gap-2">
-            <CalendarIcon className="h-4 w-4" />
-            Check-in
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !checkIn && 'text-muted-foreground'
-                )}
-              >
-                {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={checkIn}
-                onSelect={setCheckIn}
-                disabled={(date) => date < new Date()}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="flex items-center gap-2">
-            <CalendarIcon className="h-4 w-4" />
-            Check-out
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-left font-normal',
-                  !checkOut && 'text-muted-foreground'
-                )}
-              >
-                {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={checkOut}
-                onSelect={setCheckOut}
-                disabled={(date) => (checkIn ? date <= checkIn : date < new Date())}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="guests" className="flex items-center gap-2">
-            <Users className="h-4 w-4" />
-            Guests
-          </Label>
-          <Select value={capacity} onValueChange={setCapacity}>
-            <SelectTrigger id="guests">
-              <SelectValue placeholder="Guests" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">1 guest</SelectItem>
-              <SelectItem value="2">2 guests</SelectItem>
-              <SelectItem value="3">3 guests</SelectItem>
-              <SelectItem value="4">4 guests</SelectItem>
-              <SelectItem value="5">5+ guests</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Button
+          onClick={handleSearch}
+          className="w-full md:w-auto flex items-center gap-2 shadow-2xl"
+          size="lg"
+        >
+          <Search className="h-5 w-5" />
+          Search
+        </Button>
       </div>
-
-      <Button
-        onClick={handleSearch}
-        className="w-full mt-6 md:mt-4 md:w-auto md:ml-auto md:block"
-        size="lg"
-      >
-        <Search className="h-4 w-4 mr-2" />
-        Search
-      </Button>
     </div>
   );
 }

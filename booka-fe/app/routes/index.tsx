@@ -61,7 +61,7 @@ export default function Index() {
           transition={{ duration: 0.5 }}
           className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20"
         >
-          <div className="max-w-4xl mx-auto mb-12">
+          <div className="max-w-4xl mx-auto mb-6">
             <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
               Find Your Perfect Stay
             </h1>
@@ -72,7 +72,7 @@ export default function Index() {
           <HeroSearch onSearch={handleSearch} initialParams={searchFilters} />
         </motion.section>
 
-        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+        <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
           <h2 className="text-3xl font-bold mb-8">
             {searchFilters.location || searchFilters.dateFrom ? 'Search Results' : 'Featured Rooms'}
           </h2>
