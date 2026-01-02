@@ -141,6 +141,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/rooms/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get all unique room locations
+         * @description Returns a list of all unique room locations. Locations are normalized for comparison (trim, lowercase, normalize spaces and unicode), but the response returns the original location text as stored in the database.
+         */
+        get: operations["RoomsController_getAllLocations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/rooms/{id}": {
         parameters: {
             query?: never;
@@ -807,6 +827,40 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    RoomsController_getAllLocations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Locations retrieved successfully */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @example true */
+                        success?: boolean;
+                        data?: {
+                            /**
+                             * @description Array of unique location strings (original text, sorted alphabetically)
+                             * @example [
+                             *       "Los Angeles, CA",
+                             *       "New York, NY",
+                             *       "San Francisco, CA"
+                             *     ]
+                             */
+                            locations?: string[];
+                        };
+                    };
+                };
             };
         };
     };

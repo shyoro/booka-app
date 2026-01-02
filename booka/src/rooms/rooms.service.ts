@@ -147,6 +147,54 @@ export class RoomsService {
   }
 
   /**
+   * Normalize location text for uniqueness comparison
+   * @param location - Location string to normalize
+   * @returns Normalized location string
+   */
+  private normalizeLocation(location: string): string {
+    return location
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  /**
+   * Get all unique room locations
+   * @returns Array of unique location strings (original text, sorted alphabetically)
+   */
+  async getAllLocations() {
+    if (!this.db) {
+      throw new Error('Database connection is not available. Please check DATABASE_URL configuration.');
+    }
+
+    const allRooms = await this.db.select({ location: rooms.location }).from(rooms);
+
+    const normalizedSet = new Set<string>();
+    const locationMap = new Map<string, string>();
+
+    for (const room of allRooms) {
+      if (!room.location || room.location.trim() === '') {
+        continue;
+      }
+
+      const normalized = this.normalizeLocation(room.location);
+      
+      if (!normalizedSet.has(normalized)) {
+        normalizedSet.add(normalized);
+        locationMap.set(normalized, room.location);
+      }
+    }
+
+    const uniqueLocations = Array.from(locationMap.values()).sort();
+
+    return {
+      locations: uniqueLocations,
+    };
+  }
+
+  /**
    * Find room by ID
    * @param id - Room ID
    * @returns Room details

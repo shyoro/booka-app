@@ -75,6 +75,7 @@ const { data: bookingsData } = await api.GET('/api/v1/bookings');
 
 ### Rooms
 - `GET /rooms` - Search rooms (query params: location, dateFrom, dateTo, capacity, etc.)
+- `GET /rooms/locations` - Get all unique room locations (returns original text, not normalized)
 - `GET /rooms/:id` - Get room details
 - `GET /rooms/:id/availability` - Check availability
 

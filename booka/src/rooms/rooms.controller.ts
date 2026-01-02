@@ -96,6 +96,41 @@ export class RoomsController {
   }
 
   /**
+   * Get all unique room locations
+   */
+  @Public()
+  @Get('locations')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ 
+    summary: 'Get all unique room locations',
+    description: 'Returns a list of all unique room locations. Locations are normalized for comparison (trim, lowercase, normalize spaces and unicode), but the response returns the original location text as stored in the database.'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Locations retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        success: { type: 'boolean', example: true },
+        data: {
+          type: 'object',
+          properties: {
+            locations: {
+              type: 'array',
+              items: { type: 'string' },
+              example: ['Los Angeles, CA', 'New York, NY', 'San Francisco, CA'],
+              description: 'Array of unique location strings (original text, sorted alphabetically)'
+            },
+          },
+        },
+      },
+    },
+  })
+  async getAllLocations() {
+    return this.roomsService.getAllLocations();
+  }
+
+  /**
    * Get room details by ID
    */
   @Public()
