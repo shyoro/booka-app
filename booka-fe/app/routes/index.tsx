@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router';
 import { motion } from 'framer-motion';
 import { Navbar } from '~/components/layout/Navbar';
@@ -14,39 +13,49 @@ export function meta() {
 }
 
 /**
+ * Parse search params from URL
+ */
+function parseSearchParams(searchParams: URLSearchParams): SearchParams {
+  const location = searchParams.get('location') || undefined;
+  const dateFrom = searchParams.get('dateFrom') || undefined;
+  const dateTo = searchParams.get('dateTo') || undefined;
+  const capacity = searchParams.get('capacity') ? parseInt(searchParams.get('capacity')!) : undefined;
+  const minPrice = searchParams.get('minPrice') ? parseInt(searchParams.get('minPrice')!) : undefined;
+  const maxPrice = searchParams.get('maxPrice') ? parseInt(searchParams.get('maxPrice')!) : undefined;
+
+  return { location, dateFrom, dateTo, capacity, minPrice, maxPrice };
+}
+
+/**
  * Home page with hero search and featured rooms
  */
 export default function Index() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchFilters, setSearchFilters] = useState<SearchParams>(() => {
-    const location = searchParams.get('location') || undefined;
-    const dateFrom = searchParams.get('dateFrom') || undefined;
-    const dateTo = searchParams.get('dateTo') || undefined;
-    const capacity = searchParams.get('capacity') ? parseInt(searchParams.get('capacity')!) : undefined;
-
-    return { location, dateFrom, dateTo, capacity };
-  });
+  
+  const searchFilters = parseSearchParams(searchParams);
 
   const { data, isLoading } = useSearchRooms({
     location: searchFilters.location,
     dateFrom: searchFilters.dateFrom,
     dateTo: searchFilters.dateTo,
     capacity: searchFilters.capacity,
+    minPrice: searchFilters.minPrice,
+    maxPrice: searchFilters.maxPrice,
     limit: searchFilters.location || searchFilters.dateFrom ? undefined : 5,
     page: 1,
   });
 
-  useEffect(() => {
-    const params = new URLSearchParams();
-    if (searchFilters.location) params.set('location', searchFilters.location);
-    if (searchFilters.dateFrom) params.set('dateFrom', searchFilters.dateFrom);
-    if (searchFilters.dateTo) params.set('dateTo', searchFilters.dateTo);
-    if (searchFilters.capacity) params.set('capacity', searchFilters.capacity.toString());
-    setSearchParams(params, { replace: true });
-  }, [searchFilters, setSearchParams]);
-
   const handleSearch = (params: SearchParams) => {
-    setSearchFilters(params);
+    const newParams = new URLSearchParams();
+    
+    if (params.location) newParams.set('location', params.location);
+    if (params.dateFrom) newParams.set('dateFrom', params.dateFrom);
+    if (params.dateTo) newParams.set('dateTo', params.dateTo);
+    if (params.capacity) newParams.set('capacity', params.capacity.toString());
+    if (params.minPrice) newParams.set('minPrice', params.minPrice.toString());
+    if (params.maxPrice) newParams.set('maxPrice', params.maxPrice.toString());
+    
+    setSearchParams(newParams, { replace: true });
   };
 
   const rooms = data?.rooms || [];
