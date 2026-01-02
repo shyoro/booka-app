@@ -1,7 +1,6 @@
 import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
-import { Button } from '~/components/ui/button';
 import { Badge } from '~/components/ui/badge';
 import { MapPin, Users } from 'lucide-react';
 import { cn } from '~/lib/utils';
@@ -72,12 +71,11 @@ export function RoomCard({ room, onBook }: RoomCardProps) {
               ))}
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between items-center pt-4">
-            <div>
-              <span className="text-2xl font-bold text-primary">${price.toFixed(2)}</span>
+          <CardFooter className="flex justify-center items-center pt-4">
+            <div className="text-center">
+              <span className="text-2xl font-bold text-primary">${Math.round(price)}</span>
               <span className="text-sm text-muted-foreground"> /night</span>
             </div>
-            <Button className="group-hover:bg-primary/90">View Details</Button>
           </CardFooter>
         </Card>
       </Link>
