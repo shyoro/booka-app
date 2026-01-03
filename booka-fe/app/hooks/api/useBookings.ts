@@ -84,7 +84,7 @@ export function useCancelBooking() {
         throw new Error('Failed to cancel booking');
       }
 
-      if (!data?.success) {
+      if (!data) {
         throw new Error('Invalid response format');
       }
 

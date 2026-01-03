@@ -1,51 +1,11 @@
-import {
-  isRouteErrorResponse,
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "react-router";
+import { Outlet } from "react-router";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 
-import type { Route } from "./+types/root";
 import { createQueryClient } from "./lib/query-client";
 import { AuthProvider } from "./contexts/AuthContext";
 import { Toaster } from "./components/ui/sonner";
 import "./app.css";
-
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-];
-
-export function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <title>Book-A Room</title>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-      </body>
-    </html>
-  );
-}
 
 export default function App() {
   const [queryClient] = useState(() => createQueryClient());
@@ -57,48 +17,5 @@ export default function App() {
         <Toaster />
       </AuthProvider>
     </QueryClientProvider>
-  );
-}
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
-
-  // Handle route errors
-  if (isRouteErrorResponse(error)) {
-    const status = error.status;
-
-    // Silently handle well-known paths (browser extensions, etc.)
-    if (status === 404 && typeof window !== 'undefined') {
-      const pathname = window.location.pathname;
-      if (pathname.startsWith('/.well-known/')) {
-        return null;
-      }
-    }
-
-    message = status === 404 ? "404" : "Error";
-    details =
-      status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  }
-
-  // Handle non-route errors in development
-  if (!isRouteErrorResponse(error) && import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
-  return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
   );
 }

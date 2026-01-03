@@ -6,8 +6,6 @@ import { setAccessToken, setRefreshToken, clearTokens } from '~/lib/token-storag
 
 type LoginBody = paths['/api/v1/auth/login']['post']['requestBody']['content']['application/json'];
 type RegisterBody = paths['/api/v1/auth/register']['post']['requestBody']['content']['application/json'];
-type LoginResponse = paths['/api/v1/auth/login']['post']['responses'][200]['content']['application/json'];
-type RegisterResponse = paths['/api/v1/auth/register']['post']['responses'][201]['content']['application/json'];
 
 /**
  * Extract error message from API error response
@@ -134,7 +132,7 @@ export function useLogout() {
 
       // Clear tokens from storage
       clearTokens();
-      
+
       // Clear user from context
       logout();
       return null;

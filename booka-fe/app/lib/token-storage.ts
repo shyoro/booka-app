@@ -105,12 +105,3 @@ export function clearTokens(): void {
   removeAccessToken();
   removeRefreshToken();
 }
-
-/**
- * Check if user has tokens stored
- * @returns True if access token exists
- */
-export function hasTokens(): boolean {
-  return getAccessToken() !== null;
-}
-

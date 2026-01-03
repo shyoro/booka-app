@@ -14,7 +14,7 @@ import { useAuth } from '~/hooks/useAuth';
 import { useCreateBooking } from '~/hooks/api/useBookings';
 import { useRoomDetails, useRoomAvailability } from '~/hooks/api/useRooms';
 import { AuthDialog } from '~/components/auth/AuthDialog';
-import { calculateNights, formatDateRange } from '~/lib/date-utils';
+import { calculateNights } from '~/lib/date-utils';
 import { cn } from '~/lib/utils';
 import { toast } from 'sonner';
 import { MapPin, Users, Calendar as CalendarIcon, DollarSign } from 'lucide-react';
@@ -30,7 +30,7 @@ export default function RoomDetails() {
   const room = roomData;
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   /**
    * Parse date from search params
    */
@@ -51,22 +51,22 @@ export default function RoomDetails() {
     const capacity = searchParams.get('capacity');
     const minPrice = searchParams.get('minPrice');
     const maxPrice = searchParams.get('maxPrice');
-    
+
     if (location) params.set('location', location);
     if (dateFrom) params.set('dateFrom', dateFrom);
     if (dateTo) params.set('dateTo', dateTo);
     if (capacity) params.set('capacity', capacity);
     if (minPrice) params.set('minPrice', minPrice);
     if (maxPrice) params.set('maxPrice', maxPrice);
-    
+
     const queryString = params.toString();
     return queryString ? `/?${queryString}` : '/';
   };
 
-  const [checkIn, setCheckIn] = useState<Date | undefined>(() => 
+  const [checkIn, setCheckIn] = useState<Date | undefined>(() =>
     parseDateFromParams(searchParams.get('dateFrom'))
   );
-  const [checkOut, setCheckOut] = useState<Date | undefined>(() => 
+  const [checkOut, setCheckOut] = useState<Date | undefined>(() =>
     parseDateFromParams(searchParams.get('dateTo'))
   );
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
@@ -78,10 +78,10 @@ export default function RoomDetails() {
   useEffect(() => {
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
-    
+
     const newCheckIn = parseDateFromParams(dateFrom);
     const newCheckOut = parseDateFromParams(dateTo);
-    
+
     if (newCheckIn) {
       setCheckIn(newCheckIn);
     }
@@ -101,7 +101,7 @@ export default function RoomDetails() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         <Navbar />
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Skeleton className="h-8 w-32 mb-6" />
@@ -121,7 +121,7 @@ export default function RoomDetails() {
 
   if (error || !room) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
         <Navbar />
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
@@ -179,10 +179,10 @@ export default function RoomDetails() {
   const amenities = room?.amenities && typeof room.amenities === 'object' ? room.amenities : {};
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link 
+        <Link
           to={buildBackUrl()}
           className="text-muted-foreground hover:text-foreground mb-6 inline-block"
           data-test="room-details-back-link"
@@ -350,20 +350,6 @@ export default function RoomDetails() {
       </main>
 
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
-    </div>
-  );
-}
-
-export function ErrorBoundary() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-muted-foreground mb-4">Room not found</p>
-        <Link to="/">
-          <Button data-test="room-error-back-btn">Back to Home</Button>
-        </Link>
-      </div>
     </div>
   );
 }

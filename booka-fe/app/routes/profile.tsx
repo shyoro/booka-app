@@ -36,7 +36,6 @@ export default function Profile() {
   }
 
   const bookings = data?.bookings || [];
-  const today = new Date().toISOString().split('T')[0];
 
   const upcomingBookings = bookings.filter(
     (booking) => booking.checkOutDate && !isDateInPast(booking.checkOutDate) && booking.status !== 'cancelled'
@@ -75,7 +74,7 @@ export default function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       <Navbar />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <motion.div

@@ -5,9 +5,6 @@ import type { paths } from '~/types/api-types';
 type SearchRoomsResponse = paths['/api/v1/rooms']['get']['responses'][200]['content']['application/json'];
 type Room = NonNullable<NonNullable<SearchRoomsResponse['data']>['data']>[0];
 type SearchParams = paths['/api/v1/rooms']['get']['parameters']['query'];
-type RoomDetailsResponse = paths['/api/v1/rooms/{id}']['get']['responses'][200]['content']['application/json'];
-type AvailabilityResponse = paths['/api/v1/rooms/{id}/availability']['get']['responses'][200]['content']['application/json'];
-type LocationsResponse = paths['/api/v1/rooms/locations']['get']['responses'][200]['content']['application/json'];
 
 export type { Room };
 
@@ -79,6 +76,11 @@ export function useInfiniteSearchRooms(params?: SearchParams) {
         return undefined;
       }
       const { page, totalPages } = pagination;
+
+      if (!page || !totalPages) {
+        return undefined;
+      }
+
       if (page < totalPages) {
         return page + 1;
       }

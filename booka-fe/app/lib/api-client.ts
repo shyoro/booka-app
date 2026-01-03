@@ -4,9 +4,8 @@ import createClient from 'openapi-fetch';
  * Type import for OpenAPI paths
  * This will be available after running: npm run generate:api-types
  */
-import type { paths } from '~/types/api-types';
-import { getAccessToken, getRefreshToken, setAccessToken, setRefreshToken, clearTokens } from './token-storage';
-import { isTokenExpired } from './token-utils';
+import type {paths} from '~/types/api-types';
+import {clearTokens, getAccessToken, getRefreshToken, setAccessToken, setRefreshToken} from './token-storage';
 
 type OpenAPIPaths = paths;
 
@@ -19,14 +18,14 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 /**
  * Creates and configures the OpenAPI fetch client with authentication interceptors.
- * 
+ *
  * Features:
  * - Type-safe API requests using OpenAPI types
  * - Automatic JWT token injection via Authorization header
  * - Automatic token refresh on 401 errors
  * - Infinite loop protection for token refresh
  * - Base URL configuration from environment variables
- * 
+ *
  * @returns Configured OpenAPI fetch client instance
  */
 const apiClient = createClient<OpenAPIPaths>({
@@ -99,7 +98,7 @@ apiClient.use({
     if (!token) {
       return request;
     }
-    
+
     request.headers.set('Authorization', `Bearer ${token}`);
     return request;
   },
@@ -115,7 +114,7 @@ apiClient.use({
     if (response.status === 401) {
       const url = new URL(response.url);
       const isAuthEndpoint = url.pathname.includes('/auth/');
-      
+
       // Don't try to refresh on auth endpoints (login, register, refresh)
       if (isAuthEndpoint) {
         return response;
@@ -123,22 +122,21 @@ apiClient.use({
 
       // Attempt to refresh token
       const newAccessToken = await refreshAccessToken();
-      
+
       if (newAccessToken) {
         // Retry the original request with new token
         const clonedRequest = request.clone();
         clonedRequest.headers.set('Authorization', `Bearer ${newAccessToken}`);
-        
+
         try {
-          const retryResponse = await fetch(clonedRequest);
-          return retryResponse;
+          return await fetch(clonedRequest);
         } catch (error) {
           console.error('Request retry after token refresh failed:', error);
         }
       } else {
         // Refresh failed, clear tokens
         clearTokens();
-        
+
         // Dispatch custom event for auth context to handle
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('auth:token-expired'));
@@ -150,7 +148,7 @@ apiClient.use({
     if (!response.ok) {
       const contentType = response.headers.get('content-type');
       const isJson = contentType?.includes('application/json');
-      
+
       if (isJson) {
         const errorData = await response.clone().json().catch(() => null);
         if (errorData && typeof errorData === 'object' && 'error' in errorData) {
@@ -159,7 +157,7 @@ apiClient.use({
         }
       }
     }
-    
+
     return response;
   },
 });
