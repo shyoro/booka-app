@@ -15,6 +15,13 @@
       "when": 1767127458564,
       "tag": "0001_mighty_paladin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767429456742,
+      "tag": "0002_steady_marvel_boy",
+      "breakpoints": true
     }
   ]
 }

@@ -63,5 +63,17 @@ export function validateEnvironment(): Environment {
     env.EMAIL_FROM = process.env.EMAIL_FROM;
   }
 
-  return envSchema.parse(env);
+  const validatedEnv = envSchema.parse(env);
+
+  // Require JWT secrets in production
+  if (validatedEnv.NODE_ENV === 'production') {
+    if (!validatedEnv.JWT_SECRET || validatedEnv.JWT_SECRET.length < 32) {
+      throw new Error('JWT_SECRET is required in production and must be at least 32 characters long');
+    }
+    if (!validatedEnv.JWT_REFRESH_SECRET || validatedEnv.JWT_REFRESH_SECRET.length < 32) {
+      throw new Error('JWT_REFRESH_SECRET is required in production and must be at least 32 characters long');
+    }
+  }
+
+  return validatedEnv;
 }

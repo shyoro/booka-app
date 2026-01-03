@@ -111,3 +111,29 @@ export const bookingsRelations = relations(bookings, ({ one }) => ({
   }),
 }));
 
+/**
+ * Refresh tokens table
+ * Stores refresh tokens for token rotation and revocation
+ */
+export const refreshTokens = pgTable('refresh_tokens', {
+  id: serial('id').primaryKey(),
+  userId: integer('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  token: text('token').notNull().unique(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  userIdIdx: unique().on(table.userId, table.token),
+}));
+
+/**
+ * Refresh token relations
+ */
+export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [refreshTokens.userId],
+    references: [users.id],
+  }),
+}));
+

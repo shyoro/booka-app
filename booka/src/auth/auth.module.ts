@@ -22,9 +22,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService): JwtModuleOptions => {
+        const jwtSecret = configService.get<string>('JWT_SECRET');
+        if (!jwtSecret) {
+          throw new Error('JWT_SECRET is not configured. Please set JWT_SECRET environment variable.');
+        }
         const expiresIn = (configService.get<string>('JWT_EXPIRES_IN') || '15m') as StringValue;
         return {
-          secret: configService.get<string>('JWT_SECRET'),
+          secret: jwtSecret,
           signOptions: {
             expiresIn,
           },
