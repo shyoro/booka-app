@@ -881,3 +881,6 @@ type BookingIds = Pick<Booking, 'id'>;
 - **Advanced Caching**: Service worker caching strategies
 - **Performance Monitoring**: Real User Monitoring (RUM) integration
 
+### Testing Strategy
+- **Unit Tests**: Test individual function and utilities
+- **Test Coverage**: Test individual components as unit tests
