@@ -102,7 +102,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
               variant="destructive"
               className="w-full border border-destructive/20"
               onClick={() => onCancel(booking.id!)}
-              data-testid={`cancel-booking-btn-${booking.id}`}
+              data-test={`cancel-booking-btn-${booking.id}`}
             >
               Cancel Reservation
             </Button>

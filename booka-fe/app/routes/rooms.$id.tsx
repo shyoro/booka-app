@@ -284,7 +284,7 @@ export default function RoomDetails() {
                         {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0" align="start" data-test="room-checkin-calendar">
                       <Calendar
                         mode="single"
                         selected={checkIn}
@@ -309,7 +309,7 @@ export default function RoomDetails() {
                         {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent className="w-auto p-0" align="start" data-test="room-checkout-calendar">
                       <Calendar
                         mode="single"
                         selected={checkOut}

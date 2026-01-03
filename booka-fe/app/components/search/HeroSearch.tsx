@@ -88,9 +88,9 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                 <SelectValue placeholder="Where are you going?" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
-                <SelectItem value={ANY_LOCATION_VALUE}>Any Location</SelectItem>
+                <SelectItem value={ANY_LOCATION_VALUE} data-test="search-location-any">Any Location</SelectItem>
                 {locations.map((loc) => (
-                  <SelectItem key={loc} value={loc}>
+                  <SelectItem key={loc} value={loc} data-test={`search-location-${loc.toLowerCase().replace(/\s+/g, '-')}`}>
                     {loc}
                   </SelectItem>
                 ))}
@@ -117,7 +117,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                   {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0" align="start" data-test="search-checkin-calendar">
                 <Calendar
                   mode="single"
                   selected={checkIn}
@@ -148,7 +148,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                   {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
+              <PopoverContent className="w-auto p-0" align="start" data-test="search-checkout-calendar">
                 <Calendar
                   mode="single"
                   selected={checkOut}
@@ -170,11 +170,11 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                 <SelectValue placeholder="Guests" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">1 guest</SelectItem>
-                <SelectItem value="2">2 guests</SelectItem>
-                <SelectItem value="3">3 guests</SelectItem>
-                <SelectItem value="4">4 guests</SelectItem>
-                <SelectItem value="5">5+ guests</SelectItem>
+                <SelectItem value="1" data-test="search-guests-1">1 guest</SelectItem>
+                <SelectItem value="2" data-test="search-guests-2">2 guests</SelectItem>
+                <SelectItem value="3" data-test="search-guests-3">3 guests</SelectItem>
+                <SelectItem value="4" data-test="search-guests-4">4 guests</SelectItem>
+                <SelectItem value="5" data-test="search-guests-5">5+ guests</SelectItem>
               </SelectContent>
             </Select>
           </div>

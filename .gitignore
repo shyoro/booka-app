@@ -87,3 +87,7 @@ coverage/
 
 # TypeScript
 *.tsbuildinfo
+
+#Playwright
+/booka-fe/test-results/
+/booka-fe/playwright-report/
