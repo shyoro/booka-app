@@ -53,7 +53,7 @@ export function RoomGrid({
         }
       },
       {
-        rootMargin: '100px',
+        rootMargin: '200px',
       },
     );
 

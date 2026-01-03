@@ -26,7 +26,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
   const buildRoomUrl = () => {
     const baseUrl = `/rooms/${room.id}`;
     const params = new URLSearchParams();
-    
+
     if (searchParams?.location) {
       params.set('location', searchParams.location);
     }
@@ -45,7 +45,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
     if (searchParams?.maxPrice) {
       params.set('maxPrice', searchParams.maxPrice.toString());
     }
-    
+
     const queryString = params.toString();
     return queryString ? `${baseUrl}?${queryString}` : baseUrl;
   };
@@ -56,8 +56,9 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.02, y: -4 }}
       transition={{ duration: 0.2 }}
+      className="h-full"
     >
-      <Link to={buildRoomUrl()} className="block">
+      <Link to={buildRoomUrl()} className="block h-full">
         <Card
           className={cn(
             // Layout
@@ -70,7 +71,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
             'cursor-pointer group hover:shadow-2xl transition-all duration-300'
           )}
         >
-          <div className="relative h-48 w-full overflow-hidden rounded-t-2xl">
+          <div className="relative h-48 w-full overflow-hidden rounded-t-2xl shrink-0">
             <img
               src={imageUrl}
               alt={room.name || 'Room'}
@@ -80,18 +81,18 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
               }}
             />
           </div>
-          <CardHeader>
+          <CardHeader className="shrink-0">
             <h3 className="text-xl font-bold truncate group-hover:text-primary transition-colors">{room.name}</h3>
             <div className="flex items-center text-sm text-muted-foreground">
               <MapPin className="h-4 w-4 mr-1" />
               <span className="truncate">{room.location}</span>
             </div>
           </CardHeader>
-          <CardContent className="flex-1 space-y-2">
+          <CardContent className="flex-1 flex flex-col min-h-0">
             {room.description && (
-              <p className="text-sm text-muted-foreground line-clamp-2">{room.description}</p>
+              <p className="text-sm text-muted-foreground line-clamp-2 mb-2">{room.description}</p>
             )}
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap mt-auto">
               <Badge variant="secondary" className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
                 {room.capacity} guests
@@ -103,7 +104,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
               ))}
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center items-center pt-4">
+          <CardFooter className="flex justify-center items-center pt-4 shrink-0">
             <div className="text-center">
               <span className="text-2xl font-bold text-primary">${Math.round(price)}</span>
               <span className="text-sm text-muted-foreground"> /night</span>
