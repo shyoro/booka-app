@@ -87,10 +87,10 @@ export default function Profile() {
 
           <Tabs defaultValue="upcoming" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="upcoming">
+              <TabsTrigger value="upcoming" data-test="bookings-upcoming-tab">
                 Upcoming ({upcomingBookings.length})
               </TabsTrigger>
-              <TabsTrigger value="past">
+              <TabsTrigger value="past" data-test="bookings-past-tab">
                 Past ({pastBookings.length})
               </TabsTrigger>
             </TabsList>
@@ -161,10 +161,11 @@ export default function Profile() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Keep Reservation</AlertDialogCancel>
+            <AlertDialogCancel data-test="cancel-dialog-keep-btn">Keep Reservation</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancelConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-test="cancel-dialog-confirm-btn"
             >
               {cancelBooking.isPending ? 'Cancelling...' : 'Cancel Reservation'}
             </AlertDialogAction>

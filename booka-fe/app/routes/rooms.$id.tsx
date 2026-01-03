@@ -128,7 +128,7 @@ export default function RoomDetails() {
             <h1 className="text-4xl font-bold mb-4">404</h1>
             <p className="text-muted-foreground mb-4">Room not found</p>
             <Link to="/">
-              <Button>Back to Home</Button>
+              <Button data-test="room-404-back-btn">Back to Home</Button>
             </Link>
           </div>
         </main>
@@ -185,6 +185,7 @@ export default function RoomDetails() {
         <Link 
           to={buildBackUrl()}
           className="text-muted-foreground hover:text-foreground mb-6 inline-block"
+          data-test="room-details-back-link"
         >
           ← Back to search
         </Link>
@@ -270,6 +271,7 @@ export default function RoomDetails() {
                       <Button
                         variant="outline"
                         className={cn('w-full justify-start text-left font-normal', !checkIn && 'text-muted-foreground')}
+                        data-test="room-checkin-btn"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
@@ -294,6 +296,7 @@ export default function RoomDetails() {
                       <Button
                         variant="outline"
                         className={cn('w-full justify-start text-left font-normal', !checkOut && 'text-muted-foreground')}
+                        data-test="room-checkout-btn"
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
@@ -336,6 +339,7 @@ export default function RoomDetails() {
                   size="lg"
                   onClick={handleBookNow}
                   disabled={!checkIn || !checkOut || !isAvailable || createBooking.isPending}
+                  data-test="room-book-now-btn"
                 >
                   {createBooking.isPending ? 'Booking...' : 'Book Now'}
                 </Button>
@@ -357,7 +361,7 @@ export function ErrorBoundary() {
         <h1 className="text-4xl font-bold mb-4">404</h1>
         <p className="text-muted-foreground mb-4">Room not found</p>
         <Link to="/">
-          <Button>Back to Home</Button>
+          <Button data-test="room-error-back-btn">Back to Home</Button>
         </Link>
       </div>
     </div>

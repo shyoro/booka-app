@@ -37,7 +37,7 @@ export function Navbar() {
       >
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
+            <Link to="/" className="flex items-center space-x-2" data-test="navbar-logo">
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 Booka
               </span>
@@ -54,12 +54,12 @@ export function Navbar() {
                     className="flex items-center space-x-4"
                   >
                     <Link to="/profile">
-                      <Button variant="ghost" className="flex items-center space-x-2">
+                      <Button variant="ghost" className="flex items-center space-x-2" data-test="navbar-profile-btn">
                         <User className="h-4 w-4" />
                         <span>{user.name}</span>
                       </Button>
                     </Link>
-                    <Button variant="outline" onClick={handleLogout} disabled={logoutMutation.isPending}>
+                    <Button variant="outline" onClick={handleLogout} disabled={logoutMutation.isPending} data-test="navbar-logout-btn">
                       <LogOut className="h-4 w-4 mr-2" />
                       Logout
                     </Button>
@@ -71,7 +71,7 @@ export function Navbar() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20 }}
                   >
-                    <Button onClick={() => setAuthDialogOpen(true)}>Login</Button>
+                    <Button onClick={() => setAuthDialogOpen(true)} data-test="navbar-login-btn">Login</Button>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -82,6 +82,7 @@ export function Navbar() {
               size="icon"
               className="md:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              data-test="navbar-mobile-menu-btn"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -98,7 +99,7 @@ export function Navbar() {
                 {user ? (
                   <>
                     <Link to="/profile" className="block">
-                      <Button variant="ghost" className="w-full justify-start">
+                      <Button variant="ghost" className="w-full justify-start" data-test="navbar-mobile-profile-btn">
                         <User className="h-4 w-4 mr-2" />
                         {user.name}
                       </Button>
@@ -108,13 +109,14 @@ export function Navbar() {
                       className="w-full justify-start"
                       onClick={handleLogout}
                       disabled={logoutMutation.isPending}
+                      data-test="navbar-mobile-logout-btn"
                     >
                       <LogOut className="h-4 w-4 mr-2" />
                       Logout
                     </Button>
                   </>
                 ) : (
-                  <Button className="w-full" onClick={() => setAuthDialogOpen(true)}>
+                  <Button className="w-full" onClick={() => setAuthDialogOpen(true)} data-test="navbar-mobile-login-btn">
                     Login
                   </Button>
                 )}

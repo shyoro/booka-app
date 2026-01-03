@@ -58,7 +58,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
       transition={{ duration: 0.2 }}
       className="h-full"
     >
-      <Link to={buildRoomUrl()} className="block h-full">
+      <Link to={buildRoomUrl()} className="block h-full" data-test={`room-card-${room.id}`}>
         <Card
           className={cn(
             // Layout

@@ -80,8 +80,8 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
         </DialogHeader>
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'login' | 'register')}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Register</TabsTrigger>
+            <TabsTrigger value="login" data-test="login-tab">Login</TabsTrigger>
+            <TabsTrigger value="register" data-test="register-tab">Register</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
             <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
@@ -91,6 +91,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   id="login-email"
                   type="email"
                   placeholder="you@example.com"
+                  data-test="login-email-input"
                   {...loginForm.register('email')}
                 />
                 {loginForm.formState.errors.email && (
@@ -103,13 +104,14 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   id="login-password"
                   type="password"
                   placeholder="••••••••"
+                  data-test="login-password-input"
                   {...loginForm.register('password')}
                 />
                 {loginForm.formState.errors.password && (
                   <p className="text-sm text-destructive">{loginForm.formState.errors.password.message}</p>
                 )}
               </div>
-              <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+              <Button type="submit" className="w-full" disabled={loginMutation.isPending} data-test="login-btn">
                 {loginMutation.isPending ? 'Logging in...' : 'Login'}
               </Button>
             </form>
@@ -122,6 +124,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   id="register-name"
                   type="text"
                   placeholder="John Doe"
+                  data-test="register-name-input"
                   {...registerForm.register('name')}
                 />
                 {registerForm.formState.errors.name && (
@@ -134,6 +137,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   id="register-email"
                   type="email"
                   placeholder="you@example.com"
+                  data-test="register-email-input"
                   {...registerForm.register('email')}
                 />
                 {registerForm.formState.errors.email && (
@@ -146,13 +150,14 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
                   id="register-password"
                   type="password"
                   placeholder="••••••••"
+                  data-test="register-password-input"
                   {...registerForm.register('password')}
                 />
                 {registerForm.formState.errors.password && (
                   <p className="text-sm text-destructive">{registerForm.formState.errors.password.message}</p>
                 )}
               </div>
-              <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+              <Button type="submit" className="w-full" disabled={registerMutation.isPending} data-test="register-btn">
                 {registerMutation.isPending ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>

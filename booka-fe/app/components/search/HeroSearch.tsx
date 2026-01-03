@@ -84,7 +84,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
               Location
             </Label>
             <Select value={location} onValueChange={setLocation} disabled={isLoadingLocations}>
-              <SelectTrigger id="location" className="w-full">
+              <SelectTrigger id="location" className="w-full" data-test="search-location-select">
                 <SelectValue placeholder="Where are you going?" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -112,6 +112,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                     'w-full justify-start text-left font-normal',
                     !checkIn && 'text-muted-foreground'
                   )}
+                  data-test="search-checkin-btn"
                 >
                   {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
                 </Button>
@@ -142,6 +143,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                     'w-full justify-start text-left font-normal',
                     !checkOut && 'text-muted-foreground'
                   )}
+                  data-test="search-checkout-btn"
                 >
                   {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
                 </Button>
@@ -164,7 +166,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
               Guests
             </Label>
             <Select value={capacity} onValueChange={setCapacity}>
-              <SelectTrigger id="guests" className="w-full">
+              <SelectTrigger id="guests" className="w-full" data-test="search-guests-select">
                 <SelectValue placeholder="Guests" />
               </SelectTrigger>
               <SelectContent>
@@ -191,6 +193,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                     'w-full justify-start text-left font-normal',
                     priceRange[0] === 0 && priceRange[1] === 2000 && 'text-muted-foreground'
                   )}
+                  data-test="search-price-btn"
                 >
                   {priceRange[0] === 0 && priceRange[1] === 2000
                     ? 'Any price'
@@ -211,6 +214,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                       max={2000}
                       step={10}
                       className="w-full"
+                      data-test="search-price-slider"
                     />
                   </div>
                 </div>
@@ -228,6 +232,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
             'hover:shadow-[inset_0_0_15px_rgba(59,130,246,0.2)]'
           )}
           size="lg"
+          data-test="search-submit-btn"
         >
           <Search className="h-5 w-5" />
           Search
