@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'framer-motion';
 import { Navbar } from '~/components/layout/Navbar';
@@ -30,8 +30,15 @@ export default function Profile() {
   const { data, isLoading } = useBookings();
   const cancelBooking = useCancelBooking();
 
+  // Move navigation to useEffect to avoid updating RouterProvider during render
+  useEffect(() => {
+    if (!user) {
+      navigate('/', { replace: true });
+    }
+  }, [user, navigate]);
+
+  // Early return if no user (but navigation happens in effect)
   if (!user) {
-    navigate('/', { replace: true });
     return null;
   }
 

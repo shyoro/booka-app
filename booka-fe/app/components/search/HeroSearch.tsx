@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { format } from 'date-fns';
+import { format, addDays, subDays } from 'date-fns';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
@@ -56,13 +56,32 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
     ]);
   }, [initialParams]);
 
+  /**
+   * Handles search submission with date synchronization logic
+   * Ensures checkIn is always before checkOut:
+   * - If checkIn is missing, set it to checkOut minus 1 day
+   * - If checkOut is missing, set it to checkIn plus 1 day
+   */
   const handleSearch = () => {
     const isAnyLocation = location === ANY_LOCATION_VALUE;
     const searchLocation = isAnyLocation ? undefined : location;
+    
+    // Ensure checkIn is before checkOut when only one date is selected
+    let finalCheckIn = checkIn;
+    let finalCheckOut = checkOut;
+    
+    if (checkIn && !checkOut) {
+      finalCheckOut = addDays(checkIn, 1);
+    }
+    
+    if (checkOut && !checkIn) {
+      finalCheckIn = subDays(checkOut, 1);
+    }
+    
     onSearch({
       location: searchLocation,
-      dateFrom: checkIn ? format(checkIn, 'yyyy-MM-dd') : undefined,
-      dateTo: checkOut ? format(checkOut, 'yyyy-MM-dd') : undefined,
+      dateFrom: finalCheckIn ? format(finalCheckIn, 'yyyy-MM-dd') : undefined,
+      dateTo: finalCheckOut ? format(finalCheckOut, 'yyyy-MM-dd') : undefined,
       capacity: capacity ? parseInt(capacity) : undefined,
       minPrice: priceRange[0] > 0 ? priceRange[0] : undefined,
       maxPrice: priceRange[1] < 2000 ? priceRange[1] : undefined,
@@ -227,9 +246,13 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
           onClick={handleSearch}
           className={cn(
             'w-full lg:w-auto lg:self-end',
-            'flex items-center gap-2 shadow-2xl',
-            'cursor-pointer transition-all',
-            'hover:shadow-[inset_0_0_15px_rgba(59,130,246,0.2)]'
+            'bg-gradient-to-r from-blue-600 to-blue-700 text-white',
+            'border-0 shadow-lg shadow-blue-500/30',
+            'hover:from-blue-700 hover:to-blue-800',
+            'hover:shadow-xl hover:shadow-blue-500/40',
+            'hover:scale-[1.02] active:scale-[0.98]',
+            'transition-all duration-300 ease-out',
+            'backdrop-blur-sm'
           )}
           size="lg"
           data-test="search-submit-btn"

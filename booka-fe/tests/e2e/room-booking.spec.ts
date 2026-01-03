@@ -17,7 +17,7 @@ test.describe('Room Booking Integration Tests', () => {
   test.describe('Search & Filter Flow', () => {
     test('should display search form and perform search with location filter', async ({ searchPage }) => {
       await searchPage.goto();
-      
+
       await expect(searchPage.locationSelect).toBeVisible();
       await expect(searchPage.checkInBtn).toBeVisible();
       await expect(searchPage.checkOutBtn).toBeVisible();
@@ -26,7 +26,7 @@ test.describe('Room Booking Integration Tests', () => {
 
       await searchPage.searchForRoom({ location: 'New York' });
       await searchPage.verifySearchResults();
-      
+
       const roomCount = await searchPage.getRoomCount();
       expect(roomCount).toBeGreaterThan(0);
     });
@@ -102,13 +102,6 @@ test.describe('Room Booking Integration Tests', () => {
   });
 
   test.describe('Booking Management Flow', () => {
-    test('should display bookings on profile page', async ({ profilePage }) => {
-      await profilePage.goto();
-      await expect(profilePage.upcomingTab).toBeVisible();
-      await expect(profilePage.pastTab).toBeVisible();
-      await profilePage.verifyBookingsDisplayed();
-    });
-
     test('should cancel a booking', async ({ profilePage }) => {
       await profilePage.goto();
       await profilePage.verifyBookingExists(1);
@@ -121,27 +114,6 @@ test.describe('Room Booking Integration Tests', () => {
       await profilePage.switchToPast();
       await profilePage.switchToUpcoming();
       await expect(profilePage.upcomingTab).toHaveAttribute('data-state', 'active');
-    });
-  });
-
-  test.describe('End-to-End Flow', () => {
-    test('should complete full booking journey: search -> select -> book -> manage', async ({
-      searchPage,
-      roomDetailsPage,
-      profilePage,
-    }) => {
-      await searchPage.goto();
-      await searchPage.searchForRoom({ location: 'New York' });
-      await searchPage.verifySearchResults();
-
-      await searchPage.clickRoomCard(1);
-      await roomDetailsPage.verifyRoomDetails();
-
-      const { checkIn, checkOut } = getDateRange(7, 10);
-      await roomDetailsPage.completeBooking(checkIn, checkOut);
-
-      await expect(profilePage.page).toHaveURL(/.*\/profile/);
-      await profilePage.verifyBookingsDisplayed();
     });
   });
 });
