@@ -73,6 +73,13 @@ export default function RoomDetails() {
   const createBooking = useCreateBooking();
 
   /**
+   * Scroll to top on mount
+   */
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [roomId]);
+
+  /**
    * Update dates when search params change
    */
   useEffect(() => {
