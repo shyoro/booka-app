@@ -1,6 +1,6 @@
 {
   "name": "booka",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "NestJS backend application with Drizzle ORM and Docker",
   "author": "",
   "private": true,

@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ZodCompatibleValidationPipe } from './common/pipes/zod-compatible-validation.pipe';
@@ -11,9 +10,32 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS
+  const allowedOriginPatterns = [
+    /^http:\/\/localhost:\d+$/, // localhost with any port
+    /^https:\/\/booka-[a-z0-9-]+\.onrender\.com$/, // Render.com subdomains
+  ];
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Vite default port
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Check if the origin matches any allowed pattern
+      const isAllowed = allowedOriginPatterns.some((pattern) =>
+        pattern.test(origin),
+      );
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Set global prefix
