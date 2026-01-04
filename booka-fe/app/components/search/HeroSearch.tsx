@@ -65,19 +65,19 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
   const handleSearch = () => {
     const isAnyLocation = location === ANY_LOCATION_VALUE;
     const searchLocation = isAnyLocation ? undefined : location;
-    
+
     // Ensure checkIn is before checkOut when only one date is selected
     let finalCheckIn = checkIn;
     let finalCheckOut = checkOut;
-    
+
     if (checkIn && !checkOut) {
       finalCheckOut = addDays(checkIn, 1);
     }
-    
+
     if (checkOut && !checkIn) {
       finalCheckIn = subDays(checkOut, 1);
     }
-    
+
     onSearch({
       location: searchLocation,
       dateFrom: finalCheckIn ? format(finalCheckIn, 'yyyy-MM-dd') : undefined,
@@ -246,7 +246,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
           onClick={handleSearch}
           className={cn(
             'w-full lg:w-auto lg:self-end',
-            'bg-gradient-to-r from-blue-600 to-blue-700 text-white',
+            'bg-linear-to-r from-blue-500 to-blue-700 text-white',
             'border-0 shadow-lg shadow-blue-500/30',
             'hover:from-blue-700 hover:to-blue-800',
             'hover:shadow-xl hover:shadow-blue-500/40',

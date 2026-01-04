@@ -90,7 +90,7 @@ function DialogContent({
               // State variants
               'data-[state=open]:bg-accent',
               // SVG styling
-              '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4'
+              '[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg]:size-4'
             )}
           >
             <XIcon />

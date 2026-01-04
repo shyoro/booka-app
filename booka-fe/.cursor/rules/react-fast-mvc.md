@@ -51,7 +51,7 @@ Perform a strict redundancy check before outputting class strings:
 - **Transitions:** Use `transition` by default. Only use `transition-all` if specific non-standard properties require animation.
 
 ### 3. Simplification of Arbitrary Variants
-- **Direct Application:** Avoid long parent-level selectors like `[&_svg:not...]:size-4`. Apply classes directly to the child element whenever possible.
+- **Direct Application:** Avoid long parent-level selectors, Apply classes directly to the child element whenever possible.
 - **Minimal Selectors:** If arbitrary variants are necessary, use the simplest possible selector (e.g., `[&_svg]:size-4` instead of complex conditional logic).
 
 ### 4. Readability & Formatting
