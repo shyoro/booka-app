@@ -30,17 +30,17 @@ export class ProfilePage {
   async goto(): Promise<void> {
     // First navigate to home to let auth context initialize
     await this.page.goto('/');
-    
+
     // Wait for user API call to complete (auth context will fetch user on mount)
     const userResponse = await this.page.waitForResponse(
       (response) => response.url().includes('/api/v1/users/me') && response.status() === 200,
       { timeout: 15000 }
     ).catch(() => null);
-    
+
     if (!userResponse) {
       throw new Error('User API call did not complete. Authentication may have failed.');
     }
-    
+
     // Wait for AuthContext to update user state by checking if Navbar shows user info
     // The Navbar displays the user's name when authenticated, which indicates user state is set
     const navbarProfileBtn = this.page.getByTestId('navbar-profile-btn');
@@ -49,14 +49,14 @@ export class ProfilePage {
       const mobileProfileBtn = this.page.getByTestId('navbar-mobile-profile-btn');
       return mobileProfileBtn.waitFor({ state: 'visible', timeout: 10000 });
     });
-    
+
     // Set up promise to wait for bookings API before navigating
     const bookingsResponsePromise = this.page.waitForResponse(
       (response) => {
         try {
           const url = new URL(response.url());
-          return url.pathname === '/api/v1/bookings' && 
-                 response.request().method() === 'GET' && 
+          return url.pathname === '/api/v1/bookings' &&
+                 response.request().method() === 'GET' &&
                  response.status() === 200;
         } catch {
           return false;
@@ -64,19 +64,19 @@ export class ProfilePage {
       },
       { timeout: 15000 }
     ).catch(() => null);
-    
+
     // Use client-side navigation via navbar link to preserve React state
     // This avoids the full page reload that resets AuthContext state
     // The profile button is inside a Link component, so we click the button itself
     // which will trigger the Link navigation
     await navbarProfileBtn.click();
-    
+
     // Wait for URL to change to profile page
     await this.page.waitForURL('**/profile', { timeout: 5000 });
-    
+
     // Wait for bookings API call to complete
     await bookingsResponsePromise;
-    
+
     // Wait for the page to load and user to be authenticated
     // The tabs should appear once the user is authenticated and bookings are loaded
     await this.upcomingTab.waitFor({ state: 'visible', timeout: 15000 });

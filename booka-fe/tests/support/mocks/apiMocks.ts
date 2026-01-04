@@ -94,15 +94,36 @@ export async function setupRoomsMocks(page: Page): Promise<void> {
 
 /**
  * Mock bookings API endpoints
+ * Supports dynamic state updates for cancellation flow
  */
 export async function setupBookingsMocks(page: Page, context: BrowserContext): Promise<void> {
+  // Track cancelled bookings to update GET /bookings response dynamically
+  const cancelledBookingIds = new Set<number>();
+
   // Mock PATCH /api/v1/bookings/{id}/cancel (must be first to avoid matching general route)
   await page.route('**/api/v1/bookings/*/cancel**', async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify(mockCancelBookingResponse),
-    });
+    const url = new URL(route.request().url());
+    const bookingIdMatch = url.pathname.match(/\/api\/v1\/bookings\/(\d+)\/cancel/);
+    
+    if (bookingIdMatch) {
+      const bookingId = parseInt(bookingIdMatch[1], 10);
+      cancelledBookingIds.add(bookingId);
+      
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          data: {
+            id: bookingId,
+            status: 'cancelled',
+          },
+        }),
+      });
+      return;
+    }
+    
+    await route.continue();
   });
 
   // Mock GET /api/v1/bookings (list bookings) - use same pattern as other working routes
@@ -117,10 +138,19 @@ export async function setupBookingsMocks(page: Page, context: BrowserContext): P
     }
     
     if (method === 'GET') {
+      // Create a dynamic response that reflects cancelled bookings
+      const bookingsData = JSON.parse(JSON.stringify(mockBookingsResponse));
+      bookingsData.data.data = bookingsData.data.data.map((booking: { id: number; status: string }) => {
+        if (cancelledBookingIds.has(booking.id)) {
+          return { ...booking, status: 'cancelled' };
+        }
+        return booking;
+      });
+      
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
-        body: JSON.stringify(mockBookingsResponse),
+        body: JSON.stringify(bookingsData),
       });
       return;
     }
