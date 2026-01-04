@@ -136,7 +136,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                   {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start" data-test="search-checkin-calendar">
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" data-test="search-checkin-calendar">
                 <Calendar
                   mode="single"
                   selected={checkIn}
@@ -167,7 +167,7 @@ export function HeroSearch({ onSearch, initialParams }: HeroSearchProps) {
                   {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start" data-test="search-checkout-calendar">
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" data-test="search-checkout-calendar">
                 <Calendar
                   mode="single"
                   selected={checkOut}

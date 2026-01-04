@@ -255,7 +255,7 @@ export default function RoomDetails() {
                     {Object.entries(amenities).map(([key, value]) => (
                       value && (
                         <Badge key={key} variant="outline">
-                          {key}
+                          {key.replace('_', ' ')}
                         </Badge>
                       )
                     ))}
@@ -284,7 +284,7 @@ export default function RoomDetails() {
                         {checkIn ? format(checkIn, 'MMM dd, yyyy') : 'Select date'}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start" data-test="room-checkin-calendar">
+                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" data-test="room-checkin-calendar">
                       <Calendar
                         mode="single"
                         selected={checkIn}
@@ -309,7 +309,7 @@ export default function RoomDetails() {
                         {checkOut ? format(checkOut, 'MMM dd, yyyy') : 'Select date'}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start" data-test="room-checkout-calendar">
+                    <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start" data-test="room-checkout-calendar">
                       <Calendar
                         mode="single"
                         selected={checkOut}
