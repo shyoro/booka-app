@@ -9,6 +9,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover
 import { Calendar } from '~/components/ui/calendar';
 import { Label } from '~/components/ui/label';
 import { Skeleton } from '~/components/ui/skeleton';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '~/components/ui/carousel';
 import { useAuth } from '~/hooks/useAuth';
 import { useCreateBooking } from '~/hooks/api/useBookings';
 import { useRoomAvailability } from '~/hooks/api/useRooms';
@@ -157,31 +164,40 @@ export function RoomDetails({
         className="grid grid-cols-1 lg:grid-cols-3 gap-8"
       >
         <div className="lg:col-span-2 space-y-6">
-          {images.length > 0 && (
-            <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden">
-              <img
-                src={images[0]}
-                alt={room?.name}
-                className="w-full h-96 object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x600?text=Room';
-                }}
-              />
+          {images.length > 0 ? (
+            <Carousel
+              opts={{
+                align: 'start',
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-0">
+                {images.map((img, index) => (
+                  <CarouselItem key={index} className="pl-0">
+                    <div className="relative w-full aspect-[4/3] md:aspect-[16/10] rounded-2xl overflow-hidden bg-muted">
+                      <img
+                        src={img}
+                        alt={`${room?.name} - Image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/1200x900?text=Room';
+                        }}
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
               {images.length > 1 && (
-                <div className="grid grid-cols-1 gap-2">
-                  {images.slice(1, 3).map((img, i) => (
-                    <img
-                      key={i}
-                      src={img}
-                      alt={`${room?.name} ${i + 2}`}
-                      className="w-full h-48 object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Room';
-                      }}
-                    />
-                  ))}
-                </div>
+                <>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </>
               )}
+            </Carousel>
+          ) : (
+            <div className="relative w-full aspect-[4/3] md:aspect-[16/10] rounded-2xl overflow-hidden bg-muted flex items-center justify-center">
+              <span className="text-muted-foreground">No images available</span>
             </div>
           )}
 
