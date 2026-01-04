@@ -17,7 +17,7 @@ vi.mock('react-router', () => ({
  * Tests component rendering, props handling, and user interactions
  */
 describe('RoomCard', () => {
-  const mockRoom: Room = {
+  const mockRoom = {
     id: 1,
     name: 'Test Room',
     description: 'A beautiful test room',
@@ -31,9 +31,7 @@ describe('RoomCard', () => {
     },
     images: ['https://example.com/room.jpg'],
     status: 'available',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-  };
+  } as unknown as Room;
 
   it('should render room information correctly', () => {
     render(<RoomCard room={mockRoom} />);
@@ -80,9 +78,10 @@ describe('RoomCard', () => {
       maxPrice: 200,
     };
     
-    render(<RoomCard room={mockRoom} searchParams={searchParams} />);
+    const { container } = render(<RoomCard room={mockRoom} searchParams={searchParams} />);
     
-    const link = screen.getByTestId(`room-card-${mockRoom.id}`);
+    const link = container.querySelector(`[data-test="room-card-${mockRoom.id}"]`);
+    expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', expect.stringContaining('/rooms/1'));
     expect(link).toHaveAttribute('href', expect.stringContaining('location=Test+City'));
     expect(link).toHaveAttribute('href', expect.stringContaining('dateFrom=2024-01-15'));
@@ -91,14 +90,15 @@ describe('RoomCard', () => {
   });
 
   it('should build URL without query params when searchParams not provided', () => {
-    render(<RoomCard room={mockRoom} />);
+    const { container } = render(<RoomCard room={mockRoom} />);
     
-    const link = screen.getByTestId(`room-card-${mockRoom.id}`);
+    const link = container.querySelector(`[data-test="room-card-${mockRoom.id}"]`);
+    expect(link).toBeInTheDocument();
     expect(link).toHaveAttribute('href', '/rooms/1');
   });
 
   it('should handle room without description', () => {
-    const roomWithoutDescription = { ...mockRoom, description: null };
+    const roomWithoutDescription = { ...mockRoom, description: undefined };
     render(<RoomCard room={roomWithoutDescription} />);
     
     expect(screen.getByText('Test Room')).toBeInTheDocument();

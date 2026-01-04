@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { BookingCard } from '../BookingCard';
 import type { Booking } from '~/hooks/api/useBookings';
 
@@ -9,7 +8,7 @@ import type { Booking } from '~/hooks/api/useBookings';
  * Tests component rendering, status handling, and cancellation functionality
  */
 describe('BookingCard', () => {
-  const mockBooking: Booking = {
+  const mockBooking = {
     id: 1,
     userId: 1,
     roomId: 1,
@@ -33,7 +32,7 @@ describe('BookingCard', () => {
       createdAt: '2024-01-01T00:00:00Z',
       updatedAt: '2024-01-01T00:00:00Z',
     },
-  };
+  } as unknown as Booking;
 
   beforeEach(() => {
     vi.useFakeTimers();
@@ -47,7 +46,7 @@ describe('BookingCard', () => {
 
   it('should render booking information correctly', () => {
     render(<BookingCard booking={mockBooking} />);
-    
+
     expect(screen.getByText('Test Room')).toBeInTheDocument();
     expect(screen.getByText('Test City')).toBeInTheDocument();
     expect(screen.getByText('$500')).toBeInTheDocument();
@@ -56,7 +55,7 @@ describe('BookingCard', () => {
 
   it('should render room image with correct alt text', () => {
     render(<BookingCard booking={mockBooking} />);
-    
+
     const image = screen.getByAltText('Test Room');
     expect(image).toBeInTheDocument();
     expect(image).toHaveAttribute('src', 'https://example.com/room.jpg');
@@ -64,29 +63,30 @@ describe('BookingCard', () => {
 
   it('should show cancel button for upcoming bookings', () => {
     const onCancel = vi.fn();
-    render(<BookingCard booking={mockBooking} onCancel={onCancel} />);
-    
-    const cancelButton = screen.getByTestId(`cancel-booking-btn-${mockBooking.id}`);
+    const { container } = render(<BookingCard booking={mockBooking} onCancel={onCancel} />);
+
+    const cancelButton = container.querySelector(`[data-test="cancel-booking-btn-${mockBooking.id}"]`);
     expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).toHaveTextContent('Cancel Reservation');
   });
 
   it('should call onCancel when cancel button is clicked', async () => {
     const onCancel = vi.fn();
-    render(<BookingCard booking={mockBooking} onCancel={onCancel} />);
-    
-    const cancelButton = screen.getByTestId(`cancel-booking-btn-${mockBooking.id}`);
-    cancelButton.click();
-    
+    const { container } = render(<BookingCard booking={mockBooking} onCancel={onCancel} />);
+
+    const cancelButton = container.querySelector(`[data-test="cancel-booking-btn-${mockBooking.id}"]`) as HTMLElement;
+    expect(cancelButton).toBeInTheDocument();
+    cancelButton?.click();
+
     expect(onCancel).toHaveBeenCalledWith(mockBooking.id);
   });
 
   it('should not show cancel button for cancelled bookings', () => {
     const cancelledBooking = { ...mockBooking, status: 'cancelled' as const };
     const onCancel = vi.fn();
-    render(<BookingCard booking={cancelledBooking} onCancel={onCancel} />);
-    
-    expect(screen.queryByTestId(`cancel-booking-btn-${cancelledBooking.id}`)).not.toBeInTheDocument();
+    const { container } = render(<BookingCard booking={cancelledBooking} onCancel={onCancel} />);
+
+    expect(container.querySelector(`[data-test="cancel-booking-btn-${cancelledBooking.id}"]`)).not.toBeInTheDocument();
     expect(screen.getByText('CANCELLED')).toBeInTheDocument();
   });
 
@@ -97,28 +97,28 @@ describe('BookingCard', () => {
       checkOutDate: '2023-01-20',
     };
     const onCancel = vi.fn();
-    render(<BookingCard booking={pastBooking} onCancel={onCancel} />);
-    
-    expect(screen.queryByTestId(`cancel-booking-btn-${pastBooking.id}`)).not.toBeInTheDocument();
+    const { container } = render(<BookingCard booking={pastBooking} onCancel={onCancel} />);
+
+    expect(container.querySelector(`[data-test="cancel-booking-btn-${pastBooking.id}"]`)).not.toBeInTheDocument();
   });
 
   it('should display cancelled badge for cancelled bookings', () => {
     const cancelledBooking = { ...mockBooking, status: 'cancelled' as const };
     render(<BookingCard booking={cancelledBooking} />);
-    
+
     expect(screen.getByText('CANCELLED')).toBeInTheDocument();
   });
 
   it('should handle booking without room data gracefully', () => {
     const bookingWithoutRoom = { ...mockBooking, room: undefined };
     render(<BookingCard booking={bookingWithoutRoom} />);
-    
+
     expect(screen.getByText('Room')).toBeInTheDocument();
   });
 
   it('should format date range correctly', () => {
     render(<BookingCard booking={mockBooking} />);
-    
+
     // The date range should be formatted by formatDateRange utility
     // Since we're mocking dates, we check that the date range is displayed
     const dateElements = screen.getAllByText(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/);
@@ -128,7 +128,7 @@ describe('BookingCard', () => {
   it('should display correct status badge', () => {
     const pendingBooking = { ...mockBooking, status: 'pending' as const };
     render(<BookingCard booking={pendingBooking} />);
-    
+
     expect(screen.getByText('Pending')).toBeInTheDocument();
   });
 });
