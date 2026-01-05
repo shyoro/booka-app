@@ -39,6 +39,7 @@ The application follows a **modular architecture** with clear separation between
 
 **Database Layer**
 - PostgreSQL with Drizzle ORM for type-safe database operations
+- Database hosted on Neon.com platform, All Data in this application is real data hosted on neon.
 - Connection pooling configured for optimal resource management
 
 **Testing Strategy**
@@ -404,6 +405,9 @@ Test search experience, booking flow, pricing display, and recommendation algori
 
 #### Service Discovery (Consul)
 Automatic service registration, health checking, DNS-based communication, and centralized configuration management.
+
+#### Payment Integration
+Payment processing support with payment service providers such as PayPal. Integration will handle payment processing, refunds, and payment status tracking for bookings.
 
 ## Optional Components
 
