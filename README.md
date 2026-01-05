@@ -409,6 +409,9 @@ Automatic service registration, health checking, DNS-based communication, and ce
 #### Payment Integration
 Payment processing support with payment service providers such as PayPal. Integration will handle payment processing, refunds, and payment status tracking for bookings.
 
+#### Deployment Pipeline
+Automated CI/CD pipeline for continuous integration and deployment. Pipeline will include automated testing, build processes, and deployment to staging and production environments.
+
 ## Optional Components
 
 **Email Notifications (Resend Service)**
