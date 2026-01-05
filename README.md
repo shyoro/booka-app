@@ -40,7 +40,11 @@ The application follows a **modular architecture** with clear separation between
 **Database Layer**
 - PostgreSQL with Drizzle ORM for type-safe database operations
 - Connection pooling configured for optimal resource management
-- Schema-driven development with migration support
+
+**Testing Strategy**
+- **Backend:** Vitest for unit and integration tests
+- **Frontend Unit Tests:** Vitest for testing utilities, hooks, and components
+- **Frontend E2E Tests:** Playwright with Page Object Model, API call mocking, and custom fixtures
 
 ### Architectural Patterns
 
