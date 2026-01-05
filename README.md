@@ -2,6 +2,17 @@
 
 A room booking platform that enables users to search, view, and reserve available rooms. The application provides a booking experience with real-time availability updates, user authentication, and booking management capabilities.
 
+## Links
+
+| Resource | Link |
+|----------|------|
+| Live Demo | [https://booka-frontend.onrender.com/](https://booka-frontend.onrender.com/) |
+| Swagger | [https://booka-docker.onrender.com/api](https://booka-docker.onrender.com/api) |
+| Docker Hub | [https://hub.docker.com/repositories/shayazulay](https://hub.docker.com/repositories/shayazulay) |
+| My Profile Site | [https://shayazulay.dev](https://shayazulay.dev) |
+
+> **⚠️ Note:** The API and the Live Demo page are running on a Docker images served using render.com free tier. The server may need to load on first access and it may take approximately 30 seconds on the first call (Cold Start).
+
 ## High-Level Architecture
 
 The application follows a **modular architecture** with clear separation between frontend and backend services, designed for scalability and maintainability.
@@ -13,6 +24,8 @@ The application follows a **modular architecture** with clear separation between
 - React Query for efficient data fetching, caching, and state management
 - Type-safe API client generated from OpenAPI specifications
 - Component-based architecture with separation of concerns (routes, components, hooks, lib)
+- shadcn/ui component library for accessible, customizable UI components
+- Tailwind CSS for utility-first class styling
 - React Query caching with 5-minute stale time and 10-minute cache retention
 - Dockerized for consistent deployment across environments
 
