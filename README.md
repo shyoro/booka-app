@@ -4,7 +4,7 @@ A room booking platform that enables users to search, view, and reserve availabl
 
 ## High-Level Architecture
 
-The application follows a **modular architecture** with clear separation between frontend and backend services. This design choice provides a solid foundation for scalability while maintaining simplicity and ease of development.
+The application follows a **modular architecture** with clear separation between frontend and backend services, designed for scalability and maintainability.
 
 ### System Components
 
@@ -13,16 +13,16 @@ The application follows a **modular architecture** with clear separation between
 - React Query for efficient data fetching, caching, and state management
 - Type-safe API client generated from OpenAPI specifications
 - Component-based architecture with separation of concerns (routes, components, hooks, lib)
-- React Query caching with 5-minute stale time and 10-minute cache retention for optimized API response caching
-- Dockerized for containerized deployment, enabling consistent environments across development, staging, and production
+- React Query caching with 5-minute stale time and 10-minute cache retention
+- Dockerized for consistent deployment across environments
 
 **Backend (NestJS)**
 - Modular architecture organized by feature domains (auth, users, rooms, bookings, emails)
 - Dependency injection pattern throughout for testability and maintainability
 - Service layer architecture with thin controllers delegating business logic to services
 - Global modules for shared concerns (database connection, configuration)
-- Dockerized for containerized deployment, enabling easy scaling, orchestration, and consistent deployment across environments
-- Currently no caching implemented, but designed to be Redis-ready with code structured to easily introduce Redis caching layers for improved performance
+- Dockerized for consistent deployment across environments
+- Designed to be Redis-ready for future caching implementation
 
 **Database Layer**
 - PostgreSQL with Drizzle ORM for type-safe database operations
@@ -32,15 +32,15 @@ The application follows a **modular architecture** with clear separation between
 ### Architectural Patterns
 
 **Feature-Based Module Structure**
-Each business domain (authentication, room management, bookings) is encapsulated in its own module with clear boundaries. This modular design facilitates:
-- Independent development and testing of features
-- Future extraction into microservices if needed
+Each business domain (authentication, room management, bookings) is encapsulated in its own module with clear boundaries, enabling:
+- Independent development and testing
+- Future microservices extraction
 - Clear separation of concerns
 
 **Service Layer Pattern**
-Controllers handle HTTP concerns while services contain all business logic. This separation enables:
-- Reusability of business logic across different entry points
-- Easier unit testing of business rules
+Controllers handle HTTP concerns while services contain business logic, enabling:
+- Reusable business logic
+- Easier unit testing
 - Clear API boundaries
 
 **Type Safety Across Stack**
@@ -50,21 +50,20 @@ Type-safe communication between frontend and backend through:
 - Zod schema validation for runtime type checking
 
 **JWT-Based Authorization**
-The platform uses JSON Web Tokens (JWT) for authentication and authorization. This stateless approach provides several advantages:
-- Stateless authentication that doesn't require server-side session state
-- Better support for microservice architecture, as tokens can be validated independently by any service
-- Horizontal scalability without shared session state
-- Token-based access control that can be verified across service boundaries
+Stateless JWT authentication enables:
+- No server-side session state required
+- Independent token validation across services
+- Horizontal scaling without shared state
+- Token-based access control across service boundaries
 
 ### Design Philosophy
 
-This architecture is designed to be **scalable and adaptable**. As the service grows and traffic increases, the modular structure allows for:
-- Horizontal scaling of individual services
-- Performance optimizations at the module level
+The modular architecture supports:
+- Horizontal scaling of services
+- Performance optimizations at module level
 - Gradual migration to microservices if needed
-- Independent scaling of frontend and backend components
+- Independent frontend/backend scaling
 
-The current design prioritizes maintainability and developer experience while providing a foundation that can be enhanced with additional infrastructure (caching layers, message queues, read replicas) as traffic demands increase.
 
 ## API Design
 
@@ -140,7 +139,7 @@ The API follows RESTful principles and uses a consistent response format. All en
 
 ### Overview
 
-The database uses PostgreSQL with a relational schema designed to support the room booking platform. The design emphasizes data integrity through foreign key constraints, unique indexes, and check constraints. The schema follows a normalized structure with clear separation between users, rooms, and bookings.
+PostgreSQL relational schema with foreign key constraints, unique indexes, and check constraints. Normalized structure with clear separation between users, rooms, and bookings.
 
 ### Tables
 
@@ -256,8 +255,7 @@ The database uses UNIQUE constraints and indexes to enforce data integrity and p
 - **`refresh_tokens(user_id, token)`** - Composite UNIQUE constraint ensuring a user cannot have duplicate tokens
 - **`booking_dates_unique_active`** - Partial unique index on `bookings(room_id, check_in_date, check_out_date)` WHERE `status != 'cancelled'`
   - Prevents overlapping bookings for the same room
-  - Only applies to non-cancelled bookings, allowing cancelled bookings to be ignored in uniqueness checks
-  - Critical for preventing double-booking at the database level
+  - Only applies to non-cancelled bookings
 
 ### Database Design Principles
 
@@ -270,24 +268,24 @@ The database uses UNIQUE constraints and indexes to enforce data integrity and p
 
 ## Concurrency Handling
 
-The platform implements multiple concurrency control techniques to prevent race conditions and ensure data consistency, particularly for critical booking operations where multiple users may attempt to book the same room simultaneously.
+Multiple concurrency control techniques prevent race conditions and ensure data consistency for booking operations.
 
 ### Implemented Techniques
 
 #### 1. Database Transactions
-All booking operations are wrapped in database transactions to ensure atomicity. This guarantees that either all operations within a transaction succeed or all fail, preventing partial state updates.
+All booking operations use transactions to ensure atomicity—all steps succeed or all fail.
 
 **Usage:**
-- Booking creation: All steps (room lock, availability check, booking insertion) occur atomically within a single transaction
-- Transaction rollback on any error ensures data consistency
+- Booking creation: Room lock, availability check, and booking insertion occur atomically
+- Automatic rollback on error maintains data consistency
 
 #### 2. Pessimistic Locking with FOR UPDATE
-Row-level pessimistic locking is used for critical booking operations to prevent concurrent modifications.
+Row-level locking prevents concurrent modifications during booking operations.
 
 **Implementation:**
-- When creating a booking, the room row is locked using `SELECT ... FOR UPDATE`
-- This exclusive lock prevents other transactions from modifying the room until the current transaction completes
-- Concurrent booking attempts on the same room will wait for the lock to be released
+- Room row locked with `SELECT ... FOR UPDATE` during booking creation
+- Exclusive lock prevents other transactions until completion
+- Concurrent attempts wait for lock release
 
 **Example Flow:**
 1. Transaction begins
@@ -303,28 +301,23 @@ If two users attempt to book the same room simultaneously:
 - Second request acquires lock, checks availability, and receives conflict error
 
 #### 3. Partial Unique Index
-A partial unique index on the bookings table prevents overlapping bookings at the database level.
-
-**Index:** `booking_dates_unique_active` on `(room_id, check_in_date, check_out_date)` WHERE `status != 'cancelled'`
+Partial unique index `booking_dates_unique_active` on `(room_id, check_in_date, check_out_date)` WHERE `status != 'cancelled'` prevents overlapping bookings at the database level.
 
 **Benefits:**
-- Database-level enforcement prevents double-booking even if application logic fails
-- Only applies to active bookings (cancelled bookings are excluded)
-- Works in conjunction with FOR UPDATE locks for defense-in-depth
+- Database-level enforcement prevents double-booking
+- Only applies to active bookings
+- Works with FOR UPDATE locks for defense-in-depth
 
 #### 4. Conflict Detection
-Application-level conflict detection checks for overlapping date ranges before creating bookings.
+Application-level checks for overlapping date ranges before creating bookings.
 
 **Logic:**
-- Checks for existing bookings where:
-  - Same room (`room_id`)
-  - Status is not 'cancelled'
-  - Date ranges overlap (check-in < other check-out AND check-out > other check-in)
+- Same room, non-cancelled status, overlapping dates
 
 **Combined Approach:**
-- FOR UPDATE lock prevents race conditions during the check
-- Conflict detection identifies overlapping bookings
-- Partial unique index provides final database-level protection
+- FOR UPDATE lock prevents race conditions
+- Conflict detection identifies overlaps
+- Partial unique index provides database-level protection
 
 ### Concurrency Control Flow
 
@@ -334,23 +327,19 @@ User Request → Transaction Start → FOR UPDATE Lock (Room)
   → Transaction Commit → Lock Release
 ```
 
-### Future Enhancements: Distributed Locks
+### Future Implementation: Distributed Locks (Not Implemented Yet)
 
-As the platform scales to multiple instances or microservices, the current single-database locking mechanism may become insufficient. The system is designed to support progressive enhancement with distributed locking:
+For multi-instance deployments, Redis can be added for distributed locking:
+- Coordinate booking operations across instances
+- Enable horizontal scaling of booking services
+- Reduce database lock contention
+- Improve performance under high concurrency
 
-**Redis/Redlock Implementation:**
-- **Redis-based distributed locks** can be added to coordinate booking operations across multiple application instances
-- **Redlock algorithm** provides fault-tolerant distributed locking when multiple Redis nodes are used
-- This would enable:
-  - Horizontal scaling of booking services
-  - Cross-instance coordination
-  - Reduced database lock contention
-  - Better performance under high concurrency
-
-The current architecture's modular design and transaction-based approach make it straightforward to introduce a Redis/Redlock layer without major refactoring. The distributed lock would wrap the existing transaction logic, providing an additional coordination layer for multi-instance deployments.
+The modular design enables adding Redis without major refactoring.
 
 ## Scalability Strategies
-Implemented a progressive scalability strategy to handle increasing traffic and data loads while maintaining performance and reliability without overcomplicating the initial architecture.
+
+Progressive scalability strategy to handle increasing traffic while maintaining performance and simplicity.
 
 ### Current Implementations
 
@@ -362,10 +351,10 @@ Implemented a progressive scalability strategy to handle increasing traffic and 
 - **Connection Pooling:** Configured with max 10 connections per instance to optimize database resource usage
 
 #### Stateless Architecture
-- **JWT Authentication:** Stateless design enables horizontal scaling without shared session state
+- **JWT Authentication:** Stateless design enables horizontal scaling
 
 #### Code Design
-- **Domain Separation:** Clear boundaries between features facilitate future extraction into microservices
+- **Domain Separation:** Clear feature boundaries support future microservices extraction
 
 ### Future Improvements (Not Yet Implemented)
 
@@ -385,19 +374,19 @@ Implemented a progressive scalability strategy to handle increasing traffic and 
 - **Database Load Balancing:** Route read queries across replicas
 
 #### Queue Management Platform
-Async processing for email notifications, search index updates, analytics events, and high-traffic booking workflows. Decouples time-consuming operations and improves response times.
+Async processing for email notifications, search index updates, analytics events, and high-traffic booking workflows.
 
 #### Monitoring & Observability
-Track performance metrics, resource usage, database performance, and custom metrics. Implement distributed tracing for request tracking and error correlation. Set up alerts for critical failures, performance degradation.
+Track performance metrics, resource usage, and database performance. Implement distributed tracing and alerts for critical failures and performance degradation.
 
 #### Google Analytics
-User behavior tracking (search patterns, conversion funnels, user journeys), performance insights (page load times, API response times), and business intelligence (booking trends, peak usage, revenue analytics).
+User behavior tracking, performance insights, and business intelligence (booking trends, peak usage, revenue analytics).
 
 #### A/B Testing Platform
 Test search experience, booking flow, pricing display, and recommendation algorithms. Use feature flags, statistical significance tracking, and user segmentation.
 
 #### Service Discovery (Consul)
-Automatic service registration, health checking, DNS-based service communication, and centralized configuration management with dynamic updates and secret management.
+Automatic service registration, health checking, DNS-based communication, and centralized configuration management.
 
 ## Optional Components
 
