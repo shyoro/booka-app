@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import type { paths } from '~/types/api-types';
 import { getAccessToken, getRefreshToken, clearTokens } from '~/lib/token-storage';
@@ -169,28 +169,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const login = useCallback(async (email: string, password: string): Promise<void> => {
     // This will be handled by useLogin hook in useAuthMutations
     // Keeping this for backward compatibility but it's not used
     throw new Error('Use useLogin hook instead');
-  };
+  }, []);
 
-  const register = async (email: string, password: string, name: string): Promise<void> => {
+  const register = useCallback(async (email: string, password: string, name: string): Promise<void> => {
     // This will be handled by useRegister hook in useAuthMutations
     // Keeping this for backward compatibility but it's not used
     throw new Error('Use useRegister hook instead');
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     clearTokens();
     setUser(null);
-  };
+  }, []);
 
   // Determine loading state
   const loadingState = isLoading || (isFetchingUser && !user && getAccessToken() !== null);
 
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(
+    () => ({
+      user,
+      isLoading: loadingState,
+      login,
+      register,
+      logout,
+      setUser,
+    }),
+    [user, loadingState, login, register, logout]
+  );
+
   return (
-    <AuthContext.Provider value={{ user, isLoading: loadingState, login, register, logout, setUser }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );

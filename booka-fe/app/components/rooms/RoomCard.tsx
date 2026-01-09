@@ -1,3 +1,4 @@
+import { useMemo, memo } from 'react';
 import { Link } from 'react-router';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardFooter, CardHeader } from '~/components/ui/card';
@@ -15,15 +16,17 @@ interface RoomCardProps {
 
 /**
  * Room card component with glassmorphism styling and animations
+ * Memoized to prevent unnecessary re-renders when props haven't changed
  */
-export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
+function RoomCardComponent({ room, onBook, searchParams }: RoomCardProps) {
   const imageUrl = room.images && room.images.length > 0 ? room.images[0] : '/placeholder-room.jpg';
   const price = parseFloat(room.pricePerNight || '0');
 
   /**
    * Build URL with all search params to preserve search context
+   * Memoized to avoid rebuilding on every render
    */
-  const buildRoomUrl = () => {
+  const roomUrl = useMemo(() => {
     const baseUrl = `/rooms/${room.id}`;
     const params = new URLSearchParams();
 
@@ -48,7 +51,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
 
     const queryString = params.toString();
     return queryString ? `${baseUrl}?${queryString}` : baseUrl;
-  };
+  }, [room.id, searchParams]);
 
   return (
     <motion.div
@@ -58,7 +61,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
       transition={{ duration: 0.2 }}
       className="h-full"
     >
-      <Link to={buildRoomUrl()} className="block h-full" data-test={`room-card-${room.id}`}>
+      <Link to={roomUrl} className="block h-full" data-test={`room-card-${room.id}`}>
         <Card
           className={cn(
             // Layout
@@ -116,3 +119,7 @@ export function RoomCard({ room, onBook, searchParams }: RoomCardProps) {
   );
 }
 
+/**
+ * Memoized RoomCard component to prevent re-renders when props haven't changed
+ */
+export const RoomCard = memo(RoomCardComponent);

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { motion } from 'framer-motion';
 import { Navbar } from '~/components/layout/Navbar';
@@ -49,7 +50,10 @@ export default function Index() {
     maxPrice: searchFilters.maxPrice,
   });
 
-  const handleSearch = (params: SearchParams) => {
+  /**
+   * Memoized search handler to prevent unnecessary re-renders of HeroSearch
+   */
+  const handleSearch = useCallback((params: SearchParams) => {
     const newParams = new URLSearchParams();
     
     if (params.location) newParams.set('location', params.location);
@@ -60,7 +64,7 @@ export default function Index() {
     if (params.maxPrice) newParams.set('maxPrice', params.maxPrice.toString());
     
     setSearchParams(newParams, { replace: true });
-  };
+  }, [setSearchParams]);
 
   const rooms = data?.pages.flatMap((page) => page.rooms) || [];
 
